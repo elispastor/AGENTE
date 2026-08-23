@@ -293,16 +293,14 @@
       linea: document.getElementById('m-linea').value.trim(),
       direccion: document.getElementById('m-direccion').value.trim()
     };
-    enviarFormulario(
-      'https://guia-digital-z612.onrender.com/api/motorizados/registro',
-      datos,
-      'mensaje-motorizado',
-      document.getElementById('tarjeta-generada'),
-      document.getElementById('tarjeta-contenido'),
-      document.getElementById('enlace-tarjeta')
-    );
-  });
-
+   enviarFormulario(
+  'https://agente.onrender.com/api/motorizados/registro', // <-- URL correcta
+  datos,
+  'mensaje-motorizado',
+  document.getElementById('tarjeta-generada'),
+  document.getElementById('tarjeta-contenido'),
+  document.getElementById('enlace-tarjeta')
+);
   // ===== FORMULARIO NEGOCIO =====
   document.getElementById('formNegocio').addEventListener('submit', function(e) {
     e.preventDefault();
