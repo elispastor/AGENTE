@@ -50,7 +50,12 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/agente.html');
 });
 
-// 6. Tarjeta SAI (GET con ID)
+// 6. Página de motorizados
+app.get('/motorizados.html', (req, res) => {
+  res.sendFile(__dirname + '/motorizados.html');
+});
+
+// 7. Tarjeta SAI (GET con ID)
 app.get('/tarjeta/:id', (req, res) => {
   const id = req.params.id;
   res.send(`
