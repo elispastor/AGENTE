@@ -18,15 +18,41 @@ app.post('/api/sai/registro', (req, res) => {
   });
 });
 
-// 2. Página principal (MAP)
+// 2. Registro de Motorizados (POST)
+app.post('/api/motorizados/registro', (req, res) => {
+  const { nombre, telefono, linea, direccion } = req.body;
+  console.log('Motorizado registrado:', { nombre, telefono, linea, direccion });
+  res.json({
+    mensaje: `✅ Registro exitoso, ${nombre}. Bienvenido a la red de motorizados.`
+  });
+});
+
+// 3. Registro de Negocios (POST)
+app.post('/api/negocios/registro', (req, res) => {
+  const { nombre, telefono, direccion, categoria } = req.body;
+  console.log('Negocio registrado:', { nombre, telefono, direccion, categoria });
+  res.json({
+    mensaje: `✅ Registro exitoso, ${nombre}. Tu negocio ya está en la guía.`
+  });
+});
+
+// 4. Registro de Particulares (POST)
+app.post('/api/particulares/registro', (req, res) => {
+  const { nombre, telefono, profesion, direccion } = req.body;
+  console.log('Particular registrado:', { nombre, telefono, profesion, direccion });
+  res.json({
+    mensaje: `✅ Registro exitoso, ${nombre}. Tu perfil ha sido creado.`
+  });
+});
+
+// 5. Página principal (MAP)
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/agente.html');
 });
 
-// 3. Tarjeta SAI (GET con ID)
+// 6. Tarjeta SAI (GET con ID)
 app.get('/tarjeta/:id', (req, res) => {
   const id = req.params.id;
-  // Aquí podrías buscar los datos en una base de datos (por ahora usamos datos de ejemplo)
   res.send(`
     <!DOCTYPE html>
     <html>
