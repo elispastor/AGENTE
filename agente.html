@@ -14,7 +14,7 @@
     .bot { background: #f0f0f0; padding: 10px; margin: 6px 0; border-radius: 10px; }
     .input-area { display: flex; gap: 8px; flex-wrap: wrap; }
     .input-area input { flex: 1; min-width: 200px; }
-    
+
     #formulario-sai { background: white; padding: 16px; border-radius: 10px; margin-top: 20px; border: 1px solid #ddd; }
     #formulario-sai h2 { font-size: 20px; margin-top: 0; }
     #formulario-sai input, #formulario-sai button { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px; box-sizing: border-box; }
@@ -65,32 +65,23 @@
       chat.scrollTop = chat.scrollHeight;
     }
 
-    function responder(mensaje) {
-      const msg = mensaje.toLowerCase().trim();
-      if (msg.includes('hola') || msg.includes('buenas')) {
-        return "¡Hola! Soy MAP, tu agente personal. Estoy aquí para ayudarte con el SAI y la Guía Digital.";
-      }
-      if (msg.includes('sai') || msg.includes('registro') || msg.includes('automatización')) {
-        return "El SAI es el Sistema de Automatización de Ingresos. Puedes registrarte usando el formulario de abajo. ¿Necesitas ayuda con algo más?";
-      }
-      if (msg.includes('guía') || msg.includes('directorio')) {
-        return "La Guía Digital de Cúcuta es un directorio de negocios, talleres y servicios. ¿Te gustaría saber cómo incluir tu negocio?";
-      }
-      if (msg.includes('quien eres') || msg.includes('quién eres')) {
-        return "Soy MAP, tu agente personal. Mi misión es ayudarte a gestionar la Guía Digital y el SAI.";
-      }
-      return "Entiendo tu mensaje. ¿Puedes ser más específico? Estoy aquí para ayudarte con la Guía Digital o el SAI.";
-    }
-
-    function sendMessage() {
+    async function sendMessage() {
       const message = input.value.trim();
       if (!message) return;
       addMessage(message, 'user');
       input.value = '';
-      setTimeout(() => {
-        const response = responder(message);
-        addMessage(response, 'bot');
-      }, 500);
+
+      try {
+        const response = await fetch('/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ mensaje: message })
+        });
+        const data = await response.json();
+        addMessage(data.respuesta || 'No pude procesar tu mensaje.', 'bot');
+      } catch (error) {
+        addMessage('Error de conexión', 'bot');
+      }
     }
 
     send.addEventListener('click', sendMessage);
@@ -113,13 +104,11 @@
       mensaje.style.color = 'black';
 
       try {
-        const respuesta = await fetch(
-https://agente.onrender.com/api/sai/registro          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ nombre, telefono, email })
-          }
-        );
+        const respuesta = await fetch('/api/sai/registro', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nombre, telefono, email })
+        });
 
         const resultado = await respuesta.json();
 
@@ -130,7 +119,6 @@ https://agente.onrender.com/api/sai/registro          {
         mensaje.textContent = resultado.mensaje;
         mensaje.style.color = 'green';
 
-        // Mostrar tarjeta y enlace
         const tarjetaDiv = document.getElementById('tarjeta-generada');
         const tarjetaContenido = document.getElementById('tarjeta-contenido');
         const enlaceTarjeta = document.getElementById('enlace-tarjeta');
