@@ -30,18 +30,24 @@ app.post('/api/generar-tarjeta', upload.fields([
   { name: 'fotoPortada', maxCount: 1 },
   { name: 'fotosCarrusel', maxCount: 5 }
 ]), (req, res) => {
-  console.log('Datos recibidos:', req.body);
-  console.log('Archivos recibidos:', req.files);
+  // ===== VERIFICACIÓN DE RECEPCIÓN =====
+  console.log('📥 Datos del formulario recibidos:', req.body);
+  console.log('📸 Foto portada recibida:', req.files['fotoPortada'] ? req.files['fotoPortada'][0].filename : '❌ No recibida');
+  console.log('🖼️ Fotos carrusel recibidas:', req.files['fotosCarrusel'] ? req.files['fotosCarrusel'].map(f => f.filename) : '❌ No recibidas');
 
+  // ===== EXTRACCIÓN DE DATOS =====
   const { nombre, telefono, email } = req.body;
   const fotoPortada = req.files['fotoPortada'] ? req.files['fotoPortada'][0].filename : null;
   const fotosCarrusel = req.files['fotosCarrusel'] ? req.files['fotosCarrusel'].map(f => f.filename) : [];
 
+  // ===== GENERACIÓN DE TARJETA =====
   const id = Date.now().toString(36);
   const enlace = `https://agente-1-w4vk.onrender.com/tarjeta/${id}`;
 
+  // ===== GUARDADO EN MEMORIA =====
   tarjetas[id] = { nombre, telefono, email, fotoPortada, fotosCarrusel, enlace };
 
+  // ===== RESPUESTA =====
   res.json({
     mensaje: '✅ Tarjeta generada',
     enlace,
