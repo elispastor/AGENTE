@@ -33,30 +33,31 @@
   <h1>SAI <span>Digital</span></h1>
   <p class="sub">Crea tu tarjeta con fotos y carrusel</p>
 
+  <!-- FORMULARIO CORREGIDO CON enctype Y name -->
   <form id="formularioSAI" enctype="multipart/form-data">
     <div class="form-group">
       <label>👤 Nombre completo</label>
-      <input type="text" id="nombre" required>
+      <input type="text" id="nombre" name="nombre" required>
     </div>
     <div class="form-group">
       <label>📱 Teléfono / WhatsApp</label>
-      <input type="tel" id="telefono" required>
+      <input type="tel" id="telefono" name="telefono" required>
     </div>
     <div class="form-group">
       <label>📧 Correo electrónico</label>
-      <input type="email" id="email" required>
+      <input type="email" id="email" name="email" required>
     </div>
 
     <div class="form-group">
       <label>📸 Foto de portada</label>
-      <input type="file" id="fotoPortada" accept="image/*">
+      <input type="file" id="fotoPortada" name="fotoPortada" accept="image/*">
       <small>Esta imagen aparecerá al inicio de tu tarjeta.</small>
     </div>
 
     <div class="form-group">
       <label>🖼️ Fotos para carrusel (máximo 5)</label>
-      <input type="file" id="fotosCarrusel" accept="image/*" multiple>
-      <small>Estas imágenes se mostrarán en un carrusel dentro de tu tarjeta.</small>
+      <input type="file" id="fotosCarrusel" name="fotosCarrusel" accept="image/*" multiple>
+      <small>Estas imágenes se mostrarán en un carrusel dentro de tu tarjета.</small>
     </div>
 
     <div class="form-group">
@@ -81,6 +82,7 @@
     mensaje.textContent = '⏳ Generando...';
     mensaje.style.color = 'black';
 
+    // Crear FormData con los datos del formulario
     const formData = new FormData(this);
 
     try {
