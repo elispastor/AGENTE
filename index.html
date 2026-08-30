@@ -81,18 +81,7 @@
     mensaje.textContent = '⏳ Generando...';
     mensaje.style.color = 'black';
 
-    const formData = new FormData();
-    formData.append('nombre', document.getElementById('nombre').value.trim());
-    formData.append('telefono', document.getElementById('telefono').value.trim());
-    formData.append('email', document.getElementById('email').value.trim());
-
-    const fotoPortada = document.getElementById('fotoPortada').files[0];
-    if (fotoPortada) formData.append('fotoPortada', fotoPortada);
-
-    const fotosCarrusel = document.getElementById('fotosCarrusel').files;
-    for (let f of fotosCarrusel) {
-      formData.append('fotosCarrusel', f);
-    }
+    const formData = new FormData(this);
 
     try {
       const response = await fetch('/api/generar-tarjeta', {
@@ -100,8 +89,11 @@
         body: formData
       });
 
+      if (!response.ok) {
+        throw new Error(`Error HTTP: ${response.status}`);
+      }
+
       const resultado = await response.json();
-      if (!response.ok) throw new Error(resultado.error || 'Error al generar');
 
       mensaje.textContent = '✅ Tarjeta generada exitosamente.';
       mensaje.style.color = 'green';
@@ -116,7 +108,8 @@
       preview.style.display = 'block';
 
     } catch (error) {
-      mensaje.textContent = '❌ Error: ' + error.message;
+      console.error('Error:', error);
+      mensaje.textContent = '❌ Error al generar la tarjeta.';
       mensaje.style.color = 'red';
     }
   });
