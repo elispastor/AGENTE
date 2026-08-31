@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>Cubo Profesional SAI</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0a1a2e;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      font-family: 'Segoe UI', Roboto, sans-serif;
+    }
+    .scene {
+      width: 100vw;
+      height: 100vh;
+      perspective: 1200px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .cube {
+      width: 320px;
+      height: 320px;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.1s ease;
+      transform: rotateX(-20deg) rotateY(30deg);
+    }
+    @media (max-width: 480px) {
+      .cube { width: 260px; height: 260px; }
+    }
+    @media (min-width: 768px) {
+      .cube { width: 460px; height: 460px; }
+    }
+    .face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.92);
+      border: 2px solid #fbbf24;
+      box-shadow: 0 0 40px rgba(251,191,36,0.25);
+      backface-visibility: hidden;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-rows: 1fr 1fr 1fr;
+      gap: 6px;
+      padding: 8px;
+      overflow: hidden;
+    }
+    .face .slot {
+      background: rgba(11,43,64,0.06);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      color: #0b2b40;
+      font-weight: bold;
+      overflow: hidden;
+    }
+    .face .slot img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    .face .slot .icon-text {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      text-align: center;
+      line-height: 1.2;
+    }
+    .face .slot .icon-text .big { font-size: 32px; }
+    .front  { transform: rotateY(0deg) translateZ(160px); }
+    .back   { transform: rotateY(180deg) translateZ(160px); }
+    .right  { transform: rotateY(90deg) translateZ(160px); }
+    .left   { transform: rotateY(-90deg) translateZ(160px); }
+    .top    { transform: rotateX(90deg) translateZ(160px); }
+    .bottom { transform: rotateX(-90deg) translateZ(160px); }
+    @media (max-width: 480px) {
+      .face { transform: translateZ(130px); }
+      .front  { transform: rotateY(0deg) translateZ(130px); }
+      .back   { transform: rotateY(180deg) translateZ(130px); }
+      .right  { transform: rotateY(90deg) translateZ(130px); }
+      .left   { transform: rotateY(-90deg) translateZ(130px); }
+      .top    { transform: rotateX(90deg) translateZ(130px); }
+      .bottom { transform: rotateX(-90deg) translateZ(130px); }
+    }
+    @media (min-width: 768px) {
+      .face { transform: translateZ(230px); }
+      .front  { transform: rotateY(0deg) translateZ(230px); }
+      .back   { transform: rotateY(180deg) translateZ(230px); }
+      .right  { transform: rotateY(90deg) translateZ(230px); }
+      .left   { transform: rotateY(-90deg) translateZ(230px); }
+      .top    { transform: rotateX(90deg) translateZ(230px); }
+      .bottom { transform: rotateX(-90deg) translateZ(230px); }
+    }
+
+    .controls {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 16px;
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(12px);
+      padding: 10px 20px;
+      border-radius: 50px;
+      border: 1px solid rgba(255,255,255,0.12);
+      z-index: 10;
+    }
+    .controls button {
+      background: #fbbf24;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 30px;
+      font-weight: 700;
+      font-size: 14px;
+      color: #0b1a2e;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .controls button:hover { background: #f59e0b; transform: scale(1.04); }
+    .controls .info {
+      color: #a0c4e8;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      margin-right: 8px;
+    }
+    @media (max-width: 480px) {
+      .controls { gap: 8px; padding: 8px 14px; }
+      .controls button { font-size: 12px; padding: 6px 14px; }
+      .controls .info { font-size: 11px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="scene">
+  <div class="cube" id="cube">
+    <!-- CARA FRONTAL -->
+    <div class="face front">
+      <div class="slot"><div class="icon-text"><span class="big">🐙</span>Guía</div></div>
+      <div class="slot"><div class="icon-text"><span class="big">📇</span>Contacto</div></div>
+      <div class="slot"><div class="icon-text"><span class="big">📱</span>WhatsApp</div></div>
+      <div class="slot"><img src="https://via.placeholder.com/150/0b2b40/fbbf24?text=SAI" alt="SAI"></div>
+      <div class="slot"><div class="icon-text"><span class="big">⭐</span>5 estrellas</div></div>
+      <div class="slot"><div class="icon-text"><span class="big">📲</span>QR</div></div>
+      <div class="slot"><div class="icon-text"><span class="big">💡</span>Ingresos</div></div>
+      <div class="slot"><div class="icon-text"><span class="big">🔄</span>Comparte</div></div>
+      <div class="slot"><div class="icon-text"><span class="big">🚀</span>SAI</div></div>
+    </div>
+
+    <!-- CARA TRASERA -->
+    <div class="face back">
+      <div class="slot"><img src="https://via.placeholder.com/150/1a4b6d/fbbf24?text=Foto1" alt="foto"></div>
+      <div class="slot"><img src="https://via.placeholder.com/150/1a4b6d/fbbf24?text=Foto2" alt="foto"></div>
+      <div class="slot"><img src="https://via.placeholder.com/150/1a4b6d/fbbf24?text=Foto3" alt="foto"></div>
+      <div class="slot"><img src="https://via.placeholder.com/150/1a4b6d/fbbf24?text=Foto4" alt="foto"></div>
+      <div class="slot"><img src="https://via.placeholder.com/150/1a4b6d/fbbf24?text=Foto5" alt="foto"></div>
+      <div class="slot"><img src="https://via.placeholder.com/150/1a4b6d/fbbf24?text=Foto6" alt="foto"></div>
+      <div class="slot"><img src="https://via.placeholder.com/150/1a4b6d/fbbf24?text=Foto7" alt="foto"></div>
+      <div class="slot"><img src="https://via.placeholder.com/150/1a4b6d/fbbf24?text=Foto8" alt="foto"></div>
+      <div class="slot"><img src="https://via.placeholder.com/150/1a4b6d/fbbf24?text=Foto9" alt="foto"></div>
+    </div>
+
+    <!-- CARA DERECHA -->
+    <div class="face right">
+      <div class="slot"><img src="https://via.placeholder.com/150/2a1a3a/fbbf24?text=Img1" alt="img"></div>
+      <div class="slot"><img src="https://via.placeholder.com/150/2a1a3a/fbbf24?text=Img2" alt="img"></div>
+      <div class="slot"><img src="https://via.placeholder.com/150/2a1a3a/fbbf24?text=Img3" alt="img"></div>
+      <div class="slot"><img src="https://via.placeholder.com/150/2a1a3a/fbbf24?text=Img4" alt="img"></div>
+      <div class="slot"><img src="https://via.placeholder.com/150/2a1a3a/fbbf24?text=Img5" alt="img"></div>
+      <div class="slot"><img src="https://via.placeholder.com/150/2a1a3a/fbbf24?text=Img6" alt="img"></div>
+      <div class="slot"><img src="https://via.placeholder.com/150/2a1a3a/fbbf24?text=Img7" alt="img"></div>
+      <div class="slot"><img src="https://via.placeholder.com/150/2a1a3a/fbbf24?text=Img8" alt="img"></div>
+      <div class="slot"><img src="https://via.placeholder.com/150/2a1a3a/fbbf24?text=Img9" alt="img"></div>
+    </div>
+
+    <!-- CARA IZQUIERDA -->
+    <div class="face left">
+      <div class="slot"><div class="icon-text"><span class="big">📞</span>Llamar</div></div>
+      <div class="slot"><div class="icon-text"><span class="big">💬</span>Chat</div></div>
+      <div class="slot"><div class="icon-text"><span class="big">📍</span>Ubicación</div></div>
+      <div class="slot"><div class="icon-text"><span class="big">🌐</span>Web</div></div>
+      <div class="slot"><div class="icon-text"><span class="big">📧</span>Email</div></div>
+      <div class="slot"><div class="icon-text"><span class="big">🕒</span>Horario</div></div>
+      <div class="slot"><div class="icon-text"><span class="big">📝</span>Reseñas</div></div>
+      <div class="slot"><div class="icon-text"><span class="big">🎯</span>Ofertas</div></div>
+      <div class="slot"><div class="icon-text"><span class="big">🏆</span>Logros</div></div>
+    </div>
+
+    <!-- CARA SUPERIOR -->
+    <div class="face top">
+      <div class="slot"><img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=https://guia-digital.com" alt="QR"></div>
+      <div class="slot"><div class="icon-text"><span class="big">🐙</span>Pulpo</div></div>
+      <div class="slot"><div class="icon-text"><span class="big">SAI</span>Digital</div></div>
+      <div class="slot"><div class="icon-text"><span class="big">💰</span>$10</div></div>
+      <div class="slot"><div class="icon-text"><span class="big">📤</span>Compartir</div></div>
+      <div class="slot"><div class="icon-text"><span class="big">⭐</span>5★</div></div>
+      <div class="slot"><div class="icon-text"><span class="big">🔗</span>Enlace</div></div>
+      <div class="slot"><div class="icon-text"><span class="big">📱</span>Móvil</div></div>
+      <div class="slot"><div class="icon-text"><span class="big">🚀</span>Inicio</div></div>
+    </div>
+
+    <!-- CARA INFERIOR -->
+    <div class="face bottom">
+      <div class="slot"><div class="icon-text"><span class="big">📌</span>Destacado</div></div>
+      <div class="slot"><div class="icon-text"><span class="big">🔄</span>Gira</div></div>
+      <div class="slot"><div class="icon-text"><span class="big">🎨</span>Diseño</div></div>
+      <div class="slot"><div class="icon-text"><span class="big">📊</span>Estadísticas</div></div>
+      <div class="slot"><div class="icon-text"><span class="big">📈</span>Crecimiento</div></div>
+      <div class="slot"><div class="icon-text"><span class="big">🏅</span>Meta</div></div>
+      <div class="slot"><div class="icon-text"><span class="big">📋</span>Informe</div></div>
+      <div class="slot"><div class="icon-text"><span class="big">🔔</span>Notificaciones</div></div>
+      <div class="slot"><div class="icon-text"><span class="big">⚡</span>Rápido</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="controls">
+  <span class="info">🔄 Gira el cubo</span>
+  <button id="btnAuto">▶ Auto</button>
+  <button id="btnStop">⏹ Stop</button>
+</div>
+
+<script>
+  const cube = document.getElementById('cube');
+  let isDragging = false;
+  let previousX = 0;
+  let previousY = 0;
+  let rotX = -20;
+  let rotY = 30;
+  let autoRotate = true;
+  let animId = null;
+
+  function startAutoRotate() {
+    if (animId) cancelAnimationFrame(animId);
+    let last = 0;
+    const speed = 0.02;
+    function step(time) {
+      if (!autoRotate) { animId = null; return; }
+      if (last === 0) last = time;
+      const delta = time - last;
+      last = time;
+      rotY += delta * speed;
+      cube.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+      animId = requestAnimationFrame(step);
+    }
+    autoRotate = true;
+    animId = requestAnimationFrame(step);
+  }
+
+  function stopAutoRotate() {
+    autoRotate = false;
+    if (animId) { cancelAnimationFrame(animId); animId = null; }
+  }
+
+  // MOUSE
+  cube.addEventListener('mousedown', (e) => {
+    stopAutoRotate();
+    isDragging = true;
+    previousX = e.clientX;
+    previousY = e.clientY;
+  });
+  window.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+    const dx = e.clientX - previousX;
+    const dy = e.clientY - previousY;
+    rotY += dx * 0.6;
+    rotX -= dy * 0.6;
+    rotX = Math.min(80, Math.max(-80, rotX));
+    cube.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+    previousX = e.clientX;
+    previousY = e.clientY;
+  });
+  window.addEventListener('mouseup', () => { isDragging = false; });
+
+  // TÁCTIL
+  let touchX = 0, touchY = 0;
+  cube.addEventListener('touchstart', (e) => {
+    stopAutoRotate();
+    const t = e.touches[0];
+    touchX = t.clientX;
+    touchY = t.clientY;
+  }, { passive: true });
+  cube.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    const t = e.touches[0];
+    const dx = t.clientX - touchX;
+    const dy = t.clientY - touchY;
+    rotY += dx * 0.5;
+    rotX -= dy * 0.5;
+    rotX = Math.min(80, Math.max(-80, rotX));
+    cube.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+    touchX = t.clientX;
+    touchY = t.clientY;
+  }, { passive: false });
+
+  // BOTONES
+  document.getElementById('btnAuto').addEventListener('click', startAutoRotate);
+  document.getElementById('btnStop').addEventListener('click', stopAutoRotate);
+
+  // INICIO
+  startAutoRotate();
+</script>
+
+</body>
+</html>
