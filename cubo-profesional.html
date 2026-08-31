@@ -318,3 +318,83 @@
 
 </body>
 </html>
+
+// ======================================================
+// MENÚ INTERACTIVO DENTRO DEL CUBO
+// ======================================================
+document.querySelectorAll('.face').forEach((face, index) => {
+  face.style.cursor = 'pointer';
+  face.addEventListener('click', function(e) {
+    e.stopPropagation();
+    
+    // Clonar el contenido de la cara para mostrarlo en el popup
+    const contenido = this.cloneNode(true);
+    contenido.style.width = '100%';
+    contenido.style.height = '100%';
+    contenido.style.display = 'flex';
+    contenido.style.flexDirection = 'column';
+    contenido.style.justifyContent = 'center';
+    contenido.style.alignItems = 'center';
+    contenido.style.borderRadius = '16px';
+    
+    // Crear el popup
+    const popup = document.createElement('div');
+    popup.style.position = 'fixed';
+    popup.style.top = '0';
+    popup.style.left = '0';
+    popup.style.width = '100vw';
+    popup.style.height = '100vh';
+    popup.style.background = 'rgba(0,0,0,0.7)';
+    popup.style.backdropFilter = 'blur(8px)';
+    popup.style.display = 'flex';
+    popup.style.justifyContent = 'center';
+    popup.style.alignItems = 'center';
+    popup.style.zIndex = '9999';
+    popup.style.padding = '20px';
+    
+    const popupContent = document.createElement('div');
+    popupContent.style.background = 'white';
+    popupContent.style.borderRadius = '24px';
+    popupContent.style.padding = '30px';
+    popupContent.style.maxWidth = '500px';
+    popupContent.style.width = '100%';
+    popupContent.style.maxHeight = '80vh';
+    popupContent.style.overflow = 'auto';
+    popupContent.style.boxShadow = '0 30px 80px rgba(0,0,0,0.5)';
+    popupContent.style.position = 'relative';
+    popupContent.style.animation = 'fadeIn 0.3s ease';
+    popupContent.appendChild(contenido);
+    
+    // Botón de cierre
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = '✕ Cerrar';
+    closeBtn.style.position = 'absolute';
+    closeBtn.style.top = '12px';
+    closeBtn.style.right = '16px';
+    closeBtn.style.background = '#fbbf24';
+    closeBtn.style.border = 'none';
+    closeBtn.style.borderRadius = '30px';
+    closeBtn.style.padding = '8px 18px';
+    closeBtn.style.fontWeight = 'bold';
+    closeBtn.style.fontSize = '14px';
+    closeBtn.style.cursor = 'pointer';
+    closeBtn.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+    closeBtn.onclick = () => document.body.removeChild(popup);
+    popupContent.appendChild(closeBtn);
+    
+    popup.appendChild(popupContent);
+    document.body.appendChild(popup);
+  });
+});
+
+// ======================================================
+// ANIMACIÓN DE ENTRADA PARA EL POPUP
+// ======================================================
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+  }
+`;
+document.head.appendChild(style);
