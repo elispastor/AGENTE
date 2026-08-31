@@ -30,24 +30,27 @@ app.post('/api/generar-tarjeta', upload.fields([
   { name: 'fotoPortada', maxCount: 1 },
   { name: 'fotosCarrusel', maxCount: 5 }
 ]), (req, res) => {
-  // ===== VERIFICACIÓN DE RECEPCIÓN =====
-  console.log('📥 Datos del formulario recibidos:', req.body);
-  console.log('📸 Foto portada recibida:', req.files['fotoPortada'] ? req.files['fotoPortada'][0].filename : '❌ No recibida');
-  console.log('🖼️ Fotos carrusel recibidas:', req.files['fotosCarrusel'] ? req.files['fotosCarrusel'].map(f => f.filename) : '❌ No recibidas');
+  console.log('📝 Datos del formulario:', req.body);
+  console.log('📸 Archivos recibidos:', req.files);
 
-  // ===== EXTRACCIÓN DE DATOS =====
+  // Extraer campos de texto (vienen en req.body)
   const { nombre, telefono, email } = req.body;
+
+  // Validar que los campos obligatorios existan
+  if (!nombre || !telefono || !email) {
+    return res.status(400).json({ error: 'Faltan campos obligatorios: nombre, teléfono o email' });
+  }
+
+  // Extraer archivos
   const fotoPortada = req.files['fotoPortada'] ? req.files['fotoPortada'][0].filename : null;
   const fotosCarrusel = req.files['fotosCarrusel'] ? req.files['fotosCarrusel'].map(f => f.filename) : [];
 
-  // ===== GENERACIÓN DE TARJETA =====
   const id = Date.now().toString(36);
   const enlace = `https://agente-1-w4vk.onrender.com/tarjeta/${id}`;
 
-  // ===== GUARDADO EN MEMORIA =====
+  // Guardar en memoria
   tarjetas[id] = { nombre, telefono, email, fotoPortada, fotosCarrusel, enlace };
 
-  // ===== RESPUESTA =====
   res.json({
     mensaje: '✅ Tarjeta generada',
     enlace,
