@@ -54,7 +54,7 @@ app.post('/api/generar-tarjeta', upload.any(), (req, res) => {
 });
 
 // ======================================================
-// RUTA: Ver tarjeta TDI (con carrusel, botones y QR)
+// RUTA: Ver tarjeta con CARRUSEL MEJORADO
 // ======================================================
 app.get('/tarjeta/:id', (req, res) => {
   const tarjeta = tarjetas[req.params.id];
@@ -67,17 +67,13 @@ app.get('/tarjeta/:id', (req, res) => {
     tarjeta.fotosCarrusel.forEach(f => fotos.push(`/uploads/${f}`));
   }
 
-  // Generar caras del carrusel
+  // Generar caras del carrusel (SOLO IMÁGENES)
   let carruselHTML = '';
   if (fotos.length > 0) {
-    fotos.forEach((url, index) => {
+    fotos.forEach((url) => {
       carruselHTML += `
         <figure>
-          <img src="${url}" alt="Foto ${index + 1}">
-          <div class="caption">
-            <p>📸 ${tarjeta.nombre}</p>
-            <p style="font-size:14px;">${tarjeta.telefono}</p>
-          </div>
+          <img src="${url}" alt="Foto">
         </figure>
       `;
     });
@@ -85,7 +81,6 @@ app.get('/tarjeta/:id', (req, res) => {
     carruselHTML = `
       <figure>
         <img src="https://via.placeholder.com/400/fbbf24/0b2b40?text=Sube+una+foto" alt="Sin foto">
-        <div class="caption"><p>Sube tus fotos</p></div>
       </figure>
     `;
   }
@@ -103,7 +98,7 @@ app.get('/tarjeta/:id', (req, res) => {
     `;
   }
 
-  // HTML completo con botones y QR
+  // HTML con estructura mejorada (sin redundancia)
   res.send(`
     <!DOCTYPE html>
     <html>
@@ -119,29 +114,32 @@ app.get('/tarjeta/:id', (req, res) => {
           display: flex;
           justify-content: center;
           align-items: center;
-          perspective: 1200px;
           padding: 20px;
           font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
         }
         .container {
-          max-width: 600px;
+          max-width: 500px;
           width: 100%;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
           background: rgba(255,255,255,0.05);
           backdrop-filter: blur(8px);
           border-radius: 36px;
           padding: 24px;
           border: 1px solid rgba(255,255,255,0.1);
+          box-shadow: 0 25px 50px -8px rgba(0,0,0,0.6);
+        }
+        .carousel-wrapper {
+          perspective: 1000px;
+          width: 100%;
+          display: flex;
+          justify-content: center;
+          margin-bottom: 20px;
         }
         .carousel {
-          width: 280px;
-          height: 320px;
+          width: 260px;
+          height: 280px;
           position: relative;
           transform-style: preserve-3d;
-          animation: rotate 25s infinite linear;
-          margin: 10px auto;
+          animation: rotate 20s infinite linear;
         }
         .carousel figure {
           position: absolute;
@@ -149,40 +147,17 @@ app.get('/tarjeta/:id', (req, res) => {
           height: 90%;
           left: 5%;
           top: 5%;
-          border-radius: 20px;
+          border-radius: 16px;
           overflow: hidden;
-          box-shadow: 0 0 40px rgba(251,191,36,0.3);
+          box-shadow: 0 0 30px rgba(251,191,36,0.2);
           border: 2px solid #fbbf24;
           backface-visibility: hidden;
           background: #0b2b40;
-          display: flex;
-          flex-direction: column;
         }
         .carousel figure img {
           width: 100%;
-          height: 75%;
+          height: 100%;
           object-fit: cover;
-          flex-shrink: 0;
-        }
-        .carousel figure .caption {
-          background: rgba(11,43,64,0.95);
-          padding: 12px 16px;
-          text-align: center;
-          color: white;
-          flex-grow: 1;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-        }
-        .carousel figure .caption p {
-          margin: 2px 0;
-          font-size: 16px;
-          font-weight: 600;
-        }
-        .carousel figure .caption p:last-child {
-          font-size: 14px;
-          font-weight: 400;
-          color: #a0c4e8;
         }
         ${carasCSS}
         @keyframes rotate {
@@ -190,78 +165,49 @@ app.get('/tarjeta/:id', (req, res) => {
           100% { transform: rotateY(360deg); }
         }
 
-        .controls {
-          display: flex;
-          gap: 16px;
-          margin-top: 12px;
-        }
-        .controls button {
-          background: #fbbf24;
-          border: none;
-          padding: 8px 20px;
-          border-radius: 30px;
-          font-weight: 700;
-          font-size: 14px;
-          color: #0b1a2e;
-          cursor: pointer;
-          transition: 0.2s;
-          box-shadow: 0 4px 12px rgba(251,191,36,0.3);
-        }
-        .controls button:hover {
-          background: #f59e0b;
-          transform: scale(1.04);
-        }
-        .controls .info {
-          color: #a0c4e8;
-          font-size: 13px;
-          display: flex;
-          align-items: center;
-        }
-
-        .user-data {
+        /* INFORMACIÓN FIJA (sin redundancia) */
+        .info {
           text-align: center;
           color: white;
-          margin-top: 16px;
-          width: 100%;
+          margin: 10px 0 16px;
+          padding: 12px;
+          background: rgba(0,0,0,0.3);
+          border-radius: 16px;
         }
-        .user-data h2 {
+        .info h2 {
           font-size: 22px;
           font-weight: 700;
           color: #fbbf24;
         }
-        .user-data p {
+        .info p {
           font-size: 16px;
           color: #a0c4e8;
           margin: 4px 0;
         }
 
-        .acciones {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 16px;
-          margin-top: 16px;
-          width: 100%;
-        }
+        /* BOTONES DE ACCIÓN */
         .botones {
           display: flex;
           flex-wrap: wrap;
-          gap: 12px;
+          gap: 10px;
           justify-content: center;
+          margin: 12px 0;
         }
         .botones a, .botones button {
           display: inline-flex;
           align-items: center;
           gap: 8px;
-          padding: 12px 24px;
+          padding: 12px 20px;
           border-radius: 60px;
           font-weight: 700;
-          font-size: 15px;
+          font-size: 14px;
           border: none;
           text-decoration: none;
           cursor: pointer;
           transition: 0.2s;
           box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+          flex: 1 0 auto;
+          justify-content: center;
         }
         .botones a:hover, .botones button:hover {
           transform: scale(1.04);
@@ -270,13 +216,14 @@ app.get('/tarjeta/:id', (req, res) => {
         .btn-llamar { background: #1a4b6d; color: #fff; }
         .btn-compartir { background: #fbbf24; color: #0b1a2e; }
 
+        /* QR */
         .qr {
           text-align: center;
-          margin-top: 8px;
+          margin: 8px 0 12px;
         }
         .qr img {
-          width: 120px;
-          height: 120px;
+          width: 110px;
+          height: 110px;
           border-radius: 16px;
           background: #fff;
           padding: 8px;
@@ -288,42 +235,75 @@ app.get('/tarjeta/:id', (req, res) => {
           margin-top: 4px;
         }
 
+        /* CONTROLES DEL CARRUSEL */
+        .controls {
+          display: flex;
+          gap: 12px;
+          justify-content: center;
+          margin-top: 8px;
+        }
+        .controls button {
+          background: #fbbf24;
+          border: none;
+          padding: 8px 20px;
+          border-radius: 30px;
+          font-weight: 700;
+          font-size: 14px;
+          color: #0b1a2e;
+          cursor: pointer;
+          transition: 0.2s;
+        }
+        .controls button:hover {
+          background: #f59e0b;
+        }
+        .controls .info {
+          color: #a0c4e8;
+          font-size: 13px;
+          display: flex;
+          align-items: center;
+        }
+
         @media (max-width: 480px) {
-          .carousel { width: 220px; height: 260px; }
-          .carousel figure .caption p { font-size: 14px; }
-          .user-data h2 { font-size: 18px; }
-          .botones a, .botones button { font-size: 13px; padding: 10px 16px; }
+          .carousel { width: 200px; height: 220px; }
+          .info h2 { font-size: 18px; }
+          .botones a, .botones button { font-size: 13px; padding: 10px 14px; }
+          .qr img { width: 90px; height: 90px; }
         }
         @media (min-width: 768px) {
-          .carousel { width: 400px; height: 420px; }
-          .carousel figure .caption p { font-size: 18px; }
+          .carousel { width: 340px; height: 360px; }
         }
       </style>
     </head>
     <body>
       <div class="container">
-        <div class="carousel" id="carousel">
-          ${carruselHTML}
+        <!-- CARRUSEL (SOLO IMÁGENES) -->
+        <div class="carousel-wrapper">
+          <div class="carousel" id="carousel">
+            ${carruselHTML}
+          </div>
         </div>
 
-        <div class="user-data">
+        <!-- INFORMACIÓN FIJA (SIN REDUNDANCIA) -->
+        <div class="info">
           <h2>🧾 ${tarjeta.nombre}</h2>
           <p>📱 ${tarjeta.telefono}</p>
           <p>📧 ${tarjeta.email}</p>
         </div>
 
-        <div class="acciones">
-          <div class="botones">
-            <a href="https://wa.me/${tarjeta.telefono}" target="_blank" class="btn-wa">💬 WhatsApp</a>
-            <a href="tel:${tarjeta.telefono}" class="btn-llamar">📞 Llamar</a>
-            <button class="btn-compartir" onclick="compartir()">🔗 Compartir</button>
-          </div>
-          <div class="qr">
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(tarjeta.enlace)}" alt="Código QR">
-            <p>Escanea para ver la tarjeta</p>
-          </div>
+        <!-- BOTONES DE ACCIÓN -->
+        <div class="botones">
+          <a href="https://wa.me/${tarjeta.telefono}" target="_blank" class="btn-wa">💬 WhatsApp</a>
+          <a href="tel:${tarjeta.telefono}" class="btn-llamar">📞 Llamar</a>
+          <button class="btn-compartir" onclick="compartir()">🔗 Compartir</button>
         </div>
 
+        <!-- CÓDIGO QR -->
+        <div class="qr">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(tarjeta.enlace)}" alt="Código QR">
+          <p>Escanea para ver la tarjeta</p>
+        </div>
+
+        <!-- CONTROLES -->
         <div class="controls">
           <span class="info">🔄 Gira el carrusel</span>
           <button id="btnPausar">⏸ Pausar</button>
