@@ -28,21 +28,66 @@ const tarjetas = {};
 const conversaciones = {};
 
 // ======================================================
-// BASE DE CONOCIMIENTO DEL SAI
+// BASE DE CONOCIMIENTO TDI (TARJETA DIGITAL INTELIGENTE)
 // ======================================================
 const conocimiento = {
-  'que es sai': 'SAI es el Sistema de Asistencia Inteligente, una plataforma de tarjetas digitales con carrusel 3D, QR y botones de contacto.',
-  'registro': 'Para registrarte en el SAI, llena el formulario con tu nombre, teléfono y email. Recibirás tu tarjeta digital.',
-  'tarjeta': 'La tarjeta SAI es una tarjeta digital que muestra tu información de contacto, fotos en carrusel 3D, y código QR para compartir.',
-  'map': 'MAP es tu agente personal del SAI. Te guía en el registro y uso de la tarjeta digital.',
-  'ayuda': 'Puedo ayudarte con: registro en SAI, explicación de tarjetas digitales, solución de problemas.',
-  'hola': '¡Hola! Soy MAP, tu agente del SAI. ¿Cómo puedo ayudarte hoy?',
-  'gracias': '¡De nada! Estoy aquí para ayudarte con el SAI. ¿Necesitas algo más?',
-  'adios': '¡Hasta luego! Si necesitas ayuda con el SAI, aquí estaré. 😊'
+  // === INTRODUCCIÓN ===
+  'que es tdi': 'El TDI (Tarjeta Digital Inteligente) es un ecosistema digital que permite a cualquier negocio, emprendimiento o profesional tener presencia en línea con una tarjeta digital inteligente, visibilidad en la Guía Digital de Cúcuta y la posibilidad de generar ingresos a través de un sistema de referidos.',
+  'que es tarjeta digital inteligente': 'El TDI (Tarjeta Digital Inteligente) es un ecosistema digital que permite a cualquier negocio, emprendimiento o profesional tener presencia en línea con una tarjeta digital inteligente, visibilidad en la Guía Digital de Cúcuta y la posibilidad de generar ingresos a través de un sistema de referidos.',
+  
+  // === PRODUCTOS Y SERVICIOS ===
+  'plan basico': 'Plan Básico TDI: Tarjeta digital + QR + botones de acción + visibilidad en la Guía Digital. $25.000 al año.',
+  'plan intermedio': 'Plan Intermedio TDI: Todo lo anterior + enlace de referido + comisiones. $50.000 al año.',
+  'plan avanzado': 'Plan Avanzado TDI: Todo lo anterior + NFT + visibilidad destacada. $100.000 al año.',
+  'plan premium': 'Plan Premium TDI: Todo lo anterior + agente de IA (PULPO) para atención al cliente. $200.000 al año.',
+  'precios': 'Los precios TDI son: Plan Básico $25.000/año, Plan Intermedio $50.000/año, Plan Avanzado $100.000/año, Plan Premium $200.000/año. La tarjeta digital es GRATIS, pagas por la visibilidad en la Guía Digital.',
+  'costo': 'La tarjeta digital TDI es completamente GRATIS. El costo es por la visibilidad en la Guía Digital de Cúcuta, desde $25.000 al año.',
+  'cuanto cuesta': 'La tarjeta digital TDI es GRATIS. La visibilidad en la Guía Digital de Cúcuta cuesta desde $25.000 al año. ¿Te gustaría conocer los beneficios de cada plan?',
+  
+  // === PREGUNTAS FRECUENTES ===
+  'que es la tarjeta digital': 'Es una tarjeta digital inteligente con QR, botones de acción (WhatsApp, llamar, compartir) y un carrusel de fotos 3D. Todo eso incluido en el TDI.',
+  'que obtengo con mi suscripcion': 'Con tu suscripción TDI obtienes: tu sitio web en la Guía Digital, tarjeta digital, QR, botones de acción y visibilidad durante todo el año. En los planes superiores también incluye referidos, comisiones, NFT y agente IA.',
+  'puedo generar ingresos': '¡Sí! A través del sistema de referidos TDI. Cada persona que se registre con tu enlace te genera una comisión. Es una forma de ingresos pasivos mientras promocionas el TDI.',
+  'necesito experiencia tecnica': 'No. El sistema TDI es automático. Solo registras tus datos y el sistema genera tu tarjeta digital. Es tan fácil como llenar un formulario.',
+  'como pago': 'Aceptamos Pago Móvil, transferencia bancaria y próximamente pasarelas de pago. Todos los métodos son seguros y rápidos.',
+  'puedo probarlo antes de pagar': '¡Claro! Puedes generar tu tarjeta TDI gratis y ver cómo funciona. Solo pagas si quieres aparecer en la Guía Digital de Cúcuta. Es una oportunidad sin riesgo.',
+  
+  // === PROSPECCIÓN ===
+  'por que deberia pagar': 'Porque tu negocio merece ser encontrado. La tarjeta TDI es gratis, pagas por la visibilidad en la Guía Digital, donde todos los negocios de Cúcuta ya están. Es la forma más inteligente de tener presencia digital.',
+  'diferencia con otras tarjetas': 'El TDI es inteligente: tiene QR, botones de acción, carrusel de fotos 3D y un sistema de referidos que te genera ingresos. Además, te da visibilidad en la Guía Digital de Cúcuta, el directorio digital más importante de la región.',
+  'por que tdi': 'Porque el TDI combina: tarjeta digital gratis, visibilidad en la Guía Digital, ingresos pasivos por referidos y un agente IA (PULPO) que atiende a tus clientes. Todo en un solo ecosistema.',
+  
+  // === VALORES CLAVE ===
+  'accesibilidad': 'El TDI es accesible: precios desde $25.000 al año. Cualquier negocio, emprendimiento o profesional puede tener presencia digital de calidad.',
+  'automatizacion': 'El TDI automatiza todo: generación de tarjeta, código QR, botones de acción, carrusel de fotos. El sistema hace el trabajo por ti, sin necesidad de experiencia técnica.',
+  'visibilidad': 'El TDI te da visibilidad en el directorio digital más importante de Cúcuta. Tu negocio aparece donde los clientes te buscan.',
+  'ingresos pasivos': 'Con el TDI ganas por cada persona que se registra con tu enlace de referido. Es un ingreso pasivo mientras ayudas a otros negocios a tener presencia digital.',
+  
+  // === LLAMADO A LA ACCIÓN ===
+  'registrate': 'Regístrate ahora en el TDI y haz que tu negocio sea encontrado. La tarjeta es gratis. La visibilidad, invaluable. ¡El Pulpo está listo para ayudarte!',
+  'como empiezo': 'Para empezar con el TDI, solo llena el formulario de registro con tu nombre, teléfono y email. El sistema genera tu tarjeta digital automáticamente. Luego puedes elegir el plan de visibilidad que mejor se adapte a tu negocio.',
+  
+  // === PRESENTACIÓN DEL AGENTE ===
+  'quien eres': '¡Soy PULPO! 🐙 Tu agente digital del TDI (Tarjeta Digital Inteligente). Estoy aquí para ayudarte a tener presencia digital, generar ingresos pasivos y atender a tus clientes. ¿En qué puedo servirte?',
+  'que es pulpo': 'PULPO es tu agente de IA para atención al cliente. Incluido en el Plan Premium del TDI. Estoy aquí 24/7 para atender a tus prospectos y clientes, como un asistente digital con 8 brazos para servirte.',
+  
+  // === SALUDOS Y DESPEDIDAS ===
+  'hola': '¡Hola! Soy PULPO 🐙, tu agente digital del TDI (Tarjeta Digital Inteligente). ¿Cómo puedo ayudarte a hacer crecer tu negocio hoy?',
+  'buenos dias': '¡Buenos días! PULPO 🐙 reportándose. ¿Listo para darle visibilidad a tu negocio con el TDI?',
+  'buenas tardes': '¡Buenas tardes! PULPO 🐙 a tu servicio. ¿Qué necesitas saber sobre el TDI?',
+  'buenas noches': '¡Buenas noches! PULPO 🐙 sigue trabajando para ti. ¿En qué puedo ayudarte con el TDI?',
+  'gracias': '¡De nada! PULPO 🐙 está para servirte. Si necesitas más información sobre el TDI, aquí estoy. ¡Éxito con tu negocio!',
+  'adios': '¡Hasta luego! PULPO 🐙 se despide. Recuerda: el TDI te da presencia digital, visibilidad e ingresos pasivos. ¡Nos vemos pronto!',
+  'chao': '¡Chao! PULPO 🐙 siempre disponible para ti. Si necesitas ayuda con tu tarjeta TDI, aquí estoy. ¡Que tengas un excelente día!',
+  
+  // === DIVERSION ===
+  'bingo': '¡BINGO! 🎵 B-I-N-G-O... B-I-N-G-O... ¡Y Bingo fue su nombre! Ahora en serio, ¿en qué puedo ayudarte con el TDI? 🐙',
+  'chiste': '¿Por qué PULPO 🐙 no usa paracaídas? Porque siempre tiene un plan de respaldo... ¡y 8 brazos para agarrarse! 😄 ¿Necesitas ayuda con tu tarjeta TDI?',
+  'canta': '🎵 T-D-I, T-D-I, tarjeta digital con mucho style... PULPO 🐙 canta para ti, mientras tu negocio brilla sin fin. 🎤 ¿Qué más necesitas saber?',
 };
 
 // ======================================================
-// RUTA: CHAT CON AGENTE (CON IA)
+// RUTA: CHAT CON PULPO (AGENTE TDI)
 // ======================================================
 app.post('/chat', async (req, res) => {
   const { mensaje, usuario = 'anonimo' } = req.body;
@@ -78,23 +123,35 @@ app.post('/chat', async (req, res) => {
             messages: [
               { 
                 role: 'system', 
-                content: `Eres MAP, agente del SAI. Responde en español, amable y profesional. 
-                Contexto: ${JSON.stringify(conversaciones[usuario] || [])}`
+                content: `Eres PULPO 🐙, agente digital del TDI (Tarjeta Digital Inteligente). 
+                Tu misión es ayudar a negocios, emprendimientos y profesionales a tener presencia digital.
+                Responde en español, amable, profesional y persuasivo.
+                Usa emojis como 🐙, 💳, 📱, 🚀.
+                
+                INFORMACIÓN CLAVE DEL TDI:
+                - Tarjeta digital GRATIS
+                - Visibilidad en la Guía Digital de Cúcuta desde $25.000/año
+                - Plan Básico: $25.000, Intermedio: $50.000, Avanzado: $100.000, Premium: $200.000
+                - Sistema de referidos que genera ingresos pasivos
+                - No se necesita experiencia técnica
+                - Aceptamos Pago Móvil y transferencia bancaria
+                
+                Contexto de conversación: ${JSON.stringify(conversaciones[usuario] || [])}`
               },
               { role: 'user', content: mensaje }
             ],
             temperature: 0.7,
-            max_tokens: 150
+            max_tokens: 200
           })
         });
 
         const data = await response.json();
         respuesta = data.choices?.[0]?.message?.content || 
-                   'No pude procesar tu mensaje. ¿Puedes intentar de nuevo?';
+                   'Lo siento, PULPO 🐙 está teniendo un momento de reflexión. ¿Puedes intentar de nuevo?';
         
       } catch (error) {
         console.error('Error en IA:', error);
-        respuesta = 'Lo siento, el sistema de IA está teniendo problemas. ¿Puedes intentar más tarde?';
+        respuesta = 'PULPO 🐙 está descansando sus 8 brazos. Mientras tanto, ¿puedo ayudarte con información sobre el TDI? Tengo todo sobre tarjetas digitales, precios y visibilidad.';
       }
     }
 
@@ -110,7 +167,7 @@ app.post('/chat', async (req, res) => {
   } catch (error) {
     console.error('Error en chat:', error);
     res.json({ 
-      respuesta: 'Lo siento, tuve un problema procesando tu mensaje. ¿Puedes intentar de nuevo?' 
+      respuesta: 'PULPO 🐙 está reorganizando sus tentáculos. ¿Puedes intentar de nuevo?' 
     });
   }
 });
@@ -137,7 +194,7 @@ app.post('/api/generar-tarjeta', upload.any(), (req, res) => {
   };
 
   res.json({
-    mensaje: '✅ Tarjeta generada',
+    mensaje: '✅ Tarjeta TDI generada con éxito',
     enlace,
     tarjeta: { nombre, telefono, email }
   });
@@ -150,7 +207,6 @@ app.get('/tarjeta/:id', (req, res) => {
   const tarjeta = tarjetas[req.params.id];
   if (!tarjeta) return res.status(404).send('Tarjeta no encontrada');
 
-  // Preparar fotos para el carrusel
   const fotosCarrusel = [];
   if (tarjeta.fotosCarrusel && tarjeta.fotosCarrusel.length > 0) {
     tarjeta.fotosCarrusel.forEach(f => fotosCarrusel.push(`/uploads/${f}`));
@@ -158,7 +214,6 @@ app.get('/tarjeta/:id', (req, res) => {
 
   const fotoPortadaURL = tarjeta.fotoPortada ? `/uploads/${tarjeta.fotoPortada}` : null;
 
-  // Generar caras del carrusel 3D
   let carruselHTML = '';
   const totalFotos = fotosCarrusel.length;
 
@@ -182,7 +237,6 @@ app.get('/tarjeta/:id', (req, res) => {
     `;
   }
 
-  // Calcular ángulos y distancia para el carrusel 3D
   const caras = Math.max(totalFotos, 1);
   const angulo = 360 / caras;
   const translateZ = Math.min(400, Math.max(220, caras * 55));
@@ -196,14 +250,13 @@ app.get('/tarjeta/:id', (req, res) => {
     `;
   }
 
-  // HTML COMPLETO - DISEÑO PREMIUM
   res.send(`
     <!DOCTYPE html>
     <html>
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
-      <title>Tarjeta SAI - TDI</title>
+      <title>Tarjeta TDI - ${tarjeta.nombre}</title>
       <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -640,9 +693,9 @@ app.get('/tarjeta/:id', (req, res) => {
         function compartir() {
           const url = window.location.href;
           if (navigator.share) {
-            navigator.share({ title: 'Tarjeta SAI', url: url });
+            navigator.share({ title: 'Tarjeta TDI', url: url });
           } else {
-            navigator.clipboard.writeText(url).then(() => alert('📋 Enlace copiado. ¡Comparte tu tarjeta!'));
+            navigator.clipboard.writeText(url).then(() => alert('📋 Enlace copiado. ¡Comparte tu tarjeta TDI!'));
           }
         }
       </script>
@@ -659,5 +712,5 @@ app.get('/', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`✅ Servidor SAI con MAP en puerto ${PORT}`);
+  console.log(`✅ Servidor TDI con PULPO 🐙 en puerto ${PORT}`);
 });
