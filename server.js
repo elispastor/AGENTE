@@ -25,123 +25,278 @@ app.use('/uploads', express.static('uploads'));
 
 const tarjetas = {};
 
-// RUTA: Generar tarjeta con fotos
-app.post('/api/generar-tarjeta', upload.fields([
-  { name: 'fotoPortada', maxCount: 1 },
-  { name: 'fotosCarrusel', maxCount: 5 }
-]), (req, res) => {
-  console.log('Datos recibidos:', req.body);
-  console.log('Archivos recibidos:', req.files);
-
+// ======================================================
+// RUTA: Generar tarjeta con fotos (USANDO upload.any())
+// ======================================================
+app.post('/api/generar-tarjeta', upload.any(), (req, res) => {
   const { nombre, telefono, email } = req.body;
-  const fotoPortada = req.files['fotoPortada'] ? req.files['fotoPortada'][0].filename : null;
-  const fotosCarrusel = req.files['fotosCarrusel'] ? req.files['fotosCarrusel'].map(f => f.filename) : [];
+
+  // Buscar los archivos en req.files
+  const fotoPortada = req.files.find(f => f.fieldname === 'fotoPortada');
+  const fotosCarrusel = req.files.filter(f => f.fieldname === 'fotosCarrusel');
 
   const id = Date.now().toString(36);
   const enlace = `https://agente-1-w4vk.onrender.com/tarjeta/${id}`;
 
-  tarjetas[id] = { nombre, telefono, email, fotoPortada, fotosCarrusel, enlace };
+  tarjetas[id] = {
+    nombre,
+    telefono,
+    email,
+    fotoPortada: fotoPortada ? fotoPortada.filename : null,
+    fotosCarrusel: fotosCarrusel.map(f => f.filename),
+    enlace
+  };
 
   res.json({
     mensaje: '✅ Tarjeta generada',
     enlace,
-    tarjeta: { nombre, telefono, email, fotoPortada, fotosCarrusel }
+    tarjeta: { nombre, telefono, email }
   });
 });
 
-// RUTA: Ver tarjeta
+// ======================================================
+// RUTA: Ver tarjeta con CARRUSEL 3D
+// ======================================================
 app.get('/tarjeta/:id', (req, res) => {
   const tarjeta = tarjetas[req.params.id];
   if (!tarjeta) return res.status(404).send('Tarjeta no encontrada');
 
-  // Construir HTML de la tarjeta con el diseño de la plantilla de mototaxis
-  const fotoPortadaHTML = tarjeta.fotoPortada
-    ? `<img src="/uploads/${tarjeta.fotoPortada}" style="width:100%; border-radius:12px; margin:12px 0;">`
-    : '';
+  // Preparar las fotos para el carrusel
+  const fotos = [];
+  if (tarjeta.fotoPortada) fotos.push(`/uploads/${tarjeta.fotoPortada}`);
+  if (tarjeta.fotosCarrusel && tarjeta.fotosCarrusel.length > 0) {
+    tarjeta.fotosCarrusel.forEach(f => fotos.push(`/uploads/${f}`));
+  }
 
-  const carruselHTML = tarjeta.fotosCarrusel.length
-    ? tarjeta.fotosCarrusel.map(f => `<img src="/uploads/${f}" style="width:100%; border-radius:8px; margin:4px;">`).join('')
-    : '';
+  // Generar las caras del carrusel
+  let carruselHTML = '';
+  if (fotos.length > 0) {
+    fotos.forEach((url, index) => {
+      carruselHTML += `
+        <figure>
+          <img src="${url}" alt="Foto ${index + 1}">
+          <div class="caption">
+            <p>📸 ${tarjeta.nombre}</p>
+            <p style="font-size:14px;">${tarjeta.telefono}</p>
+          </div>
+        </figure>
+      `;
+    });
+  } else {
+    carruselHTML = `
+      <figure>
+        <img src="https://via.placeholder.com/400/fbbf24/0b2b40?text=Sube+una+foto" alt="Sin foto">
+        <div class="caption"><p>Sube tus fotos</p></div>
+      </figure>
+    `;
+  }
 
+  // Calcular el ángulo de rotación para cada cara
+  const totalFotos = fotos.length || 1;
+  const angulo = 360 / totalFotos;
+  const translateZ = Math.min(400, Math.max(200, totalFotos * 60));
+
+  // Generar CSS dinámico para las caras
+  let carasCSS = '';
+  for (let i = 0; i < totalFotos; i++) {
+    carasCSS += `
+      .carousel figure:nth-child(${i + 1}) {
+        transform: rotateY(${i * angulo}deg) translateZ(${translateZ}px);
+      }
+    `;
+  }
+
+  // HTML de la tarjeta con carrusel 3D
   res.send(`
     <!DOCTYPE html>
     <html>
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-      <title>Tarjeta SAI</title>
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+      <title>Tarjeta SAI - Carrusel 3D</title>
       <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, system-ui, sans-serif; }
-        body { background: linear-gradient(145deg, #0a1a2e, #1a2f44); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 16px; }
-        .card { max-width: 440px; width: 100%; background: #ffffff; border-radius: 36px; box-shadow: 0 25px 50px -8px rgba(0,0,0,0.6); overflow: hidden; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+          background: linear-gradient(145deg, #0a1a2e, #1a2f44);
+          min-height: 100vh;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          perspective: 1200px;
+          padding: 20px;
+          font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+          overflow: hidden;
+        }
+        .container {
+          max-width: 600px;
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+        .carousel {
+          width: 280px;
+          height: 320px;
+          position: relative;
+          transform-style: preserve-3d;
+          animation: rotate 25s infinite linear;
+          margin: 20px auto;
+        }
+        .carousel figure {
+          position: absolute;
+          width: 90%;
+          height: 90%;
+          left: 5%;
+          top: 5%;
+          border-radius: 20px;
+          overflow: hidden;
+          box-shadow: 0 0 40px rgba(251,191,36,0.3);
+          border: 2px solid #fbbf24;
+          backface-visibility: hidden;
+          background: #0b2b40;
+          display: flex;
+          flex-direction: column;
+        }
+        .carousel figure img {
+          width: 100%;
+          height: 75%;
+          object-fit: cover;
+          flex-shrink: 0;
+        }
+        .carousel figure .caption {
+          background: rgba(11,43,64,0.95);
+          padding: 12px 16px;
+          text-align: center;
+          color: white;
+          flex-grow: 1;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+        }
+        .carousel figure .caption p {
+          margin: 2px 0;
+          font-size: 16px;
+          font-weight: 600;
+        }
+        .carousel figure .caption p:last-child {
+          font-size: 14px;
+          font-weight: 400;
+          color: #a0c4e8;
+        }
+        ${carasCSS}
+        @keyframes rotate {
+          0% { transform: rotateY(0deg); }
+          100% { transform: rotateY(360deg); }
+        }
 
-        .portada { background: linear-gradient(135deg, #0f2b44, #1a4b6d); padding: 20px; text-align: center; border-bottom: 4px solid #fbbf24; }
-        .portada .icon { font-size: 56px; color: #fbbf24; }
-        .portada h1 { font-size: 22px; font-weight: 800; color: #fff; }
-        .portada h1 span { color: #fbbf24; }
+        .controls {
+          display: flex;
+          gap: 16px;
+          margin-top: 24px;
+        }
+        .controls button {
+          background: #fbbf24;
+          border: none;
+          padding: 10px 24px;
+          border-radius: 30px;
+          font-weight: 700;
+          font-size: 14px;
+          color: #0b1a2e;
+          cursor: pointer;
+          transition: 0.2s;
+          box-shadow: 0 4px 12px rgba(251,191,36,0.3);
+        }
+        .controls button:hover {
+          background: #f59e0b;
+          transform: scale(1.04);
+        }
+        .controls .info {
+          color: #a0c4e8;
+          font-size: 13px;
+          display: flex;
+          align-items: center;
+        }
 
-        .profile { padding: 20px; text-align: center; }
-        .profile .avatar { width: 80px; height: 80px; background: linear-gradient(135deg, #0f2b44, #1a4b6d); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; border: 4px solid #fbbf24; }
-        .profile .avatar i { font-size: 36px; color: #fff; }
-        .profile h2 { font-size: 20px; font-weight: 700; color: #0b1a2e; }
-        .profile .business { font-size: 16px; font-weight: 600; color: #1a4b6d; }
-        .profile .phone { font-size: 15px; color: #4a5e72; margin: 4px 0; }
-        .profile .address { font-size: 14px; color: #6b7f93; }
+        .user-data {
+          text-align: center;
+          color: white;
+          margin-top: 16px;
+        }
+        .user-data h2 {
+          font-size: 22px;
+          font-weight: 700;
+          color: #fbbf24;
+        }
+        .user-data p {
+          font-size: 16px;
+          color: #a0c4e8;
+          margin: 4px 0;
+        }
+        .btn-compartir {
+          margin-top: 12px;
+          background: #fbbf24;
+          border: none;
+          padding: 12px 28px;
+          border-radius: 30px;
+          font-weight: 700;
+          font-size: 16px;
+          color: #0b1a2e;
+          cursor: pointer;
+          box-shadow: 0 4px 12px rgba(251,191,36,0.3);
+        }
+        .btn-compartir:hover {
+          background: #f59e0b;
+        }
 
-        .carrusel { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 12px 0; }
-        .carrusel img { max-width: 100%; border-radius: 8px; }
-
-        .actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; padding: 0 20px 16px; }
-        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 18px; border-radius: 60px; font-weight: 700; font-size: 14px; border: none; cursor: pointer; text-decoration: none; flex: 1 0 auto; min-width: 100px; }
-        .btn-whatsapp { background: #25D366; color: #fff; }
-        .btn-call { background: #1a4b6d; color: #fff; }
-        .btn-share { background: #fbbf24; color: #0b1a2e; }
-
-        .qr-section { text-align: center; padding: 8px 20px 16px; }
-        .qr-section img { width: 120px; height: 120px; border-radius: 16px; background: #fff; padding: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-
-        .footer { background: #f8fafc; padding: 16px 20px; text-align: center; border-top: 1px solid #eef2f6; }
-        .footer a { text-decoration: none; font-weight: 700; color: #1a4b6d; }
-        .footer small { display: block; font-size: 12px; color: #6b7f93; margin-top: 4px; }
+        @media (max-width: 480px) {
+          .carousel { width: 220px; height: 260px; }
+          .carousel figure .caption p { font-size: 14px; }
+          .user-data h2 { font-size: 18px; }
+        }
+        @media (min-width: 768px) {
+          .carousel { width: 400px; height: 420px; }
+          .carousel figure .caption p { font-size: 18px; }
+        }
       </style>
     </head>
     <body>
-      <div class="card">
-        <div class="portada">
-          <div class="icon"><i class="fas fa-id-card"></i></div>
-          <h1>TARJETA <span>SAI</span></h1>
+      <div class="container">
+        <div class="carousel" id="carousel">
+          ${carruselHTML}
         </div>
 
-        <div class="profile">
-          <div class="avatar"><i class="fas fa-user-tie"></i></div>
-          <h2 id="nombreTarjeta">${tarjeta.nombre || 'Usuario SAI'}</h2>
-          <div class="business"><i class="fas fa-briefcase"></i> Digital</div>
-          <div class="phone"><i class="fas fa-phone"></i> ${tarjeta.telefono || 'No disponible'}</div>
-          <div class="address"><i class="fas fa-envelope"></i> ${tarjeta.email || 'No disponible'}</div>
+        <div class="user-data">
+          <h2>👤 ${tarjeta.nombre}</h2>
+          <p>📱 ${tarjeta.telefono}</p>
+          <p>📧 ${tarjeta.email}</p>
+          <button class="btn-compartir" onclick="compartir()">🔗 Compartir tarjeta</button>
         </div>
 
-        ${fotoPortadaHTML ? `<div style="padding:0 20px;">${fotoPortadaHTML}</div>` : ''}
-        ${carruselHTML ? `<div class="carrusel" style="padding:0 20px;">${carruselHTML}</div>` : ''}
-
-        <div class="actions">
-          <a href="https://wa.me/${tarjeta.telefono || ''}" target="_blank" class="btn btn-whatsapp"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-          <a href="tel:${tarjeta.telefono || ''}" class="btn btn-call"><i class="fas fa-phone"></i> Llamar</a>
-          <button class="btn btn-share" onclick="compartir()"><i class="fas fa-share-alt"></i> Compartir</button>
-        </div>
-
-        <div class="qr-section">
-          <img id="qrImage" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(tarjeta.enlace)}" alt="Código QR" />
-          <p><i class="fas fa-qrcode"></i> Escanea para ver esta tarjeta</p>
-        </div>
-
-        <div class="footer">
-          <a href="https://guia-digital.com" target="_blank">🐙 Guía Digital</a>
-          <small>Tarjeta generada con SAI</small>
+        <div class="controls">
+          <span class="info">🔄 Gira el carrusel</span>
+          <button id="btnPausar">⏸ Pausar</button>
+          <button id="btnReanudar">▶ Reanudar</button>
         </div>
       </div>
 
       <script>
+        const carousel = document.getElementById('carousel');
+        let paused = false;
+
+        document.getElementById('btnPausar').addEventListener('click', function() {
+          if (!paused) {
+            carousel.style.animationPlayState = 'paused';
+            paused = true;
+          }
+        });
+
+        document.getElementById('btnReanudar').addEventListener('click', function() {
+          if (paused) {
+            carousel.style.animationPlayState = 'running';
+            paused = false;
+          }
+        });
+
         function compartir() {
           const url = window.location.href;
           if (navigator.share) {
@@ -156,11 +311,13 @@ app.get('/tarjeta/:id', (req, res) => {
   `);
 });
 
+// ======================================================
 // Página principal
+// ======================================================
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });
 
 app.listen(PORT, () => {
-  console.log(`✅ Servidor SAI en puerto ${PORT}`);
+  console.log(`✅ Servidor SAI con carrusel 3D en puerto ${PORT}`);
 });
