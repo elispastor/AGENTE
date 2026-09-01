@@ -26,25 +26,31 @@ app.use('/uploads', express.static('uploads'));
 const tarjetas = {};
 
 // ======================================================
-// RUTA: Generar tarjeta con fotos
+// RUTA: Generar tarjeta con fotos (USANDO upload.any())
 // ======================================================
-app.post('/api/generar-tarjeta', upload.fields([
-  { name: 'fotoPortada', maxCount: 1 },
-  { name: 'fotosCarrusel', maxCount: 5 }
-]), (req, res) => {
+app.post('/api/generar-tarjeta', upload.any(), (req, res) => {
   const { nombre, telefono, email } = req.body;
-  const fotoPortada = req.files['fotoPortada'] ? req.files['fotoPortada'][0].filename : null;
-  const fotosCarrusel = req.files['fotosCarrusel'] ? req.files['fotosCarrusel'].map(f => f.filename) : [];
+
+  // Buscar los archivos en req.files
+  const fotoPortada = req.files.find(f => f.fieldname === 'fotoPortada');
+  const fotosCarrusel = req.files.filter(f => f.fieldname === 'fotosCarrusel');
 
   const id = Date.now().toString(36);
   const enlace = `https://agente-1-w4vk.onrender.com/tarjeta/${id}`;
 
-  tarjetas[id] = { nombre, telefono, email, fotoPortada, fotosCarrusel, enlace };
+  tarjetas[id] = {
+    nombre,
+    telefono,
+    email,
+    fotoPortada: fotoPortada ? fotoPortada.filename : null,
+    fotosCarrusel: fotosCarrusel.map(f => f.filename),
+    enlace
+  };
 
   res.json({
     mensaje: '✅ Tarjeta generada',
     enlace,
-    tarjeta: { nombre, telefono, email, fotoPortada, fotosCarrusel }
+    tarjeta: { nombre, telefono, email }
   });
 });
 
