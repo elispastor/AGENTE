@@ -619,4 +619,101 @@ app.get('/tarjeta/:id', (req, res) => {
           }
         }
 
-        ::-webkit-sc
+        ::-webkit-scrollbar {
+          width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+          background: #fbbf24;
+          border-radius: 20px;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+
+        <div class="foto-portada-wrapper">
+          ${fotoPortadaURL ? `
+            <div class="foto-portada">
+              <img src="${fotoPortadaURL}" alt="Logo de ${tarjeta.nombre}">
+            </div>
+          ` : `
+            <div class="foto-portada-placeholder">🖼️</div>
+          `}
+        </div>
+
+        <div class="carousel-wrapper">
+          <div class="carousel-3d" id="carousel3d">
+            ${carruselHTML}
+          </div>
+        </div>
+
+        <div class="info">
+          <h2>🧾 ${tarjeta.nombre}</h2>
+          <p>📱 ${tarjeta.telefono}</p>
+          <p>📧 ${tarjeta.email}</p>
+        </div>
+
+        <div class="botones">
+          <a href="https://wa.me/${tarjeta.telefono}" target="_blank" class="btn-wa">💬 WhatsApp</a>
+          <a href="tel:${tarjeta.telefono}" class="btn-llamar">📞 Llamar</a>
+          <button class="btn-compartir" onclick="compartir()">🔗 Compartir</button>
+        </div>
+
+        <div class="qr">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(tarjeta.enlace)}" alt="Código QR">
+          <p>📲 Escanea para ver la tarjeta</p>
+        </div>
+
+        <div class="controls">
+          <span class="info-text">🔄 Giro automático</span>
+          <button id="btnPausar">⏸ Pausar</button>
+          <button id="btnReanudar">▶ Reanudar</button>
+        </div>
+
+      </div>
+
+      <script>
+        const carousel = document.getElementById('carousel3d');
+        let paused = false;
+
+        document.getElementById('btnPausar').addEventListener('click', function() {
+          if (!paused) {
+            carousel.style.animationPlayState = 'paused';
+            paused = true;
+          }
+        });
+
+        document.getElementById('btnReanudar').addEventListener('click', function() {
+          if (paused) {
+            carousel.style.animationPlayState = 'running';
+            paused = false;
+          }
+        });
+
+        function compartir() {
+          const url = window.location.href;
+          if (navigator.share) {
+            navigator.share({ title: 'Tarjeta TDI', url: url });
+          } else {
+            navigator.clipboard.writeText(url).then(() => alert('📋 Enlace copiado. ¡Comparte tu tarjeta TDI!'));
+          }
+        }
+      </script>
+    </body>
+    </html>
+  `);
+});
+
+// ======================================================
+// Página principal
+// ======================================================
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/index.html');
+});
+
+app.listen(PORT, () => {
+  console.log(`✅ Servidor TDI con PULPO 🐙 en puerto ${PORT}`);
+});
