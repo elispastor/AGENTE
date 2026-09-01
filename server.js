@@ -54,19 +54,18 @@ app.post('/api/generar-tarjeta', upload.any(), (req, res) => {
 });
 
 // ======================================================
-// RUTA: Ver tarjeta con CARRUSEL 3D PERFECTO
+// RUTA: Ver tarjeta con CARRUSEL 3D PREMIUM
 // ======================================================
 app.get('/tarjeta/:id', (req, res) => {
   const tarjeta = tarjetas[req.params.id];
   if (!tarjeta) return res.status(404).send('Tarjeta no encontrada');
 
-  // Preparar fotos para el carrusel (SOLO las del carrusel)
+  // Preparar fotos para el carrusel
   const fotosCarrusel = [];
   if (tarjeta.fotosCarrusel && tarjeta.fotosCarrusel.length > 0) {
     tarjeta.fotosCarrusel.forEach(f => fotosCarrusel.push(`/uploads/${f}`));
   }
 
-  // Foto de portada (LOGO)
   const fotoPortadaURL = tarjeta.fotoPortada ? `/uploads/${tarjeta.fotoPortada}` : null;
 
   // Generar caras del carrusel 3D
@@ -96,7 +95,7 @@ app.get('/tarjeta/:id', (req, res) => {
   // Calcular ángulos y distancia para el carrusel 3D
   const caras = Math.max(totalFotos, 1);
   const angulo = 360 / caras;
-  const translateZ = Math.min(380, Math.max(200, caras * 55));
+  const translateZ = Math.min(400, Math.max(220, caras * 55));
 
   let carasCSS = '';
   for (let i = 0; i < caras; i++) {
@@ -107,7 +106,7 @@ app.get('/tarjeta/:id', (req, res) => {
     `;
   }
 
-  // HTML COMPLETO
+  // HTML COMPLETO - DISEÑO PREMIUM
   res.send(`
     <!DOCTYPE html>
     <html>
@@ -124,37 +123,57 @@ app.get('/tarjeta/:id', (req, res) => {
           display: flex;
           justify-content: center;
           align-items: center;
-          padding: 16px;
+          padding: 20px;
           font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
         }
 
         .container {
-          max-width: 560px;
+          max-width: 520px;
           width: 100%;
-          background: rgba(255,255,255,0.06);
-          backdrop-filter: blur(12px);
-          border-radius: 40px;
-          padding: 24px 20px 20px;
-          border: 1px solid rgba(255,255,255,0.08);
-          box-shadow: 0 30px 60px -12px rgba(0,0,0,0.7);
+          background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+          backdrop-filter: blur(16px);
+          border-radius: 48px;
+          padding: 30px 24px 28px;
+          border: 1px solid rgba(255,255,255,0.1);
+          box-shadow: 0 40px 80px -16px rgba(0,0,0,0.8);
+          position: relative;
+          overflow: hidden;
         }
 
-        /* ===== FOTO DE PORTADA (LOGO) - CÍRCULO PERFECTO ===== */
+        /* Efecto de brillo superior */
+        .container::before {
+          content: '';
+          position: absolute;
+          top: -50%;
+          left: -50%;
+          width: 200%;
+          height: 200%;
+          background: radial-gradient(circle at 30% 20%, rgba(251,191,36,0.03), transparent 60%);
+          pointer-events: none;
+        }
+
+        /* ===== FOTO DE PORTADA (LOGO) ===== */
         .foto-portada-wrapper {
           display: flex;
           justify-content: center;
-          margin-bottom: 16px;
+          margin-bottom: 18px;
+          position: relative;
+          z-index: 2;
         }
         .foto-portada {
-          width: 130px;
-          height: 130px;
+          width: 120px;
+          height: 120px;
           border-radius: 50%;
           overflow: hidden;
           border: 3px solid #fbbf24;
-          box-shadow: 0 0 35px rgba(251,191,36,0.3);
+          box-shadow: 0 0 40px rgba(251,191,36,0.25), inset 0 0 40px rgba(251,191,36,0.05);
           background: #0b2b40;
           flex-shrink: 0;
           position: relative;
+          transition: transform 0.3s ease;
+        }
+        .foto-portada:hover {
+          transform: scale(1.05);
         }
         .foto-portada img {
           width: 100%;
@@ -163,52 +182,69 @@ app.get('/tarjeta/:id', (req, res) => {
           background: #0b2b40;
         }
         .foto-portada-placeholder {
-          width: 130px;
-          height: 130px;
+          width: 120px;
+          height: 120px;
           border-radius: 50%;
           background: linear-gradient(135deg, #fbbf24, #f59e0b);
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 52px;
+          font-size: 48px;
           color: #0b1a2e;
           border: 3px solid #fbbf24;
-          box-shadow: 0 0 35px rgba(251,191,36,0.3);
+          box-shadow: 0 0 40px rgba(251,191,36,0.25);
         }
 
-        /* ===== CARRUSEL 3D - SIN RECORTAR ===== */
+        /* ===== CARRUSEL 3D PREMIUM ===== */
         .carousel-wrapper {
           perspective: 1200px;
           width: 100%;
           display: flex;
           justify-content: center;
-          margin: 8px 0 16px;
-          padding: 5px 0;
+          margin: 10px 0 18px;
+          padding: 8px 0;
+          position: relative;
+          z-index: 1;
         }
 
         .carousel-3d {
-          width: min(300px, 80vw);
-          height: min(300px, 80vw);
+          width: min(300px, 78vw);
+          height: min(300px, 78vw);
           position: relative;
           transform-style: preserve-3d;
-          animation: rotateCarousel 22s infinite linear;
+          animation: rotateCarousel 20s infinite linear;
         }
 
         .carousel-3d .carousel-face {
           position: absolute;
-          width: 88%;
-          height: 88%;
-          left: 6%;
-          top: 6%;
-          border-radius: 20px;
+          width: 92%;
+          height: 92%;
+          left: 4%;
+          top: 4%;
+          border-radius: 24px;
           overflow: hidden;
-          box-shadow: 0 0 40px rgba(251,191,36,0.15);
-          border: 2px solid rgba(251,191,36,0.35);
+          box-shadow: 
+            0 0 50px rgba(251,191,36,0.15),
+            inset 0 0 50px rgba(251,191,36,0.05);
+          border: 2px solid rgba(251,191,36,0.3);
           backface-visibility: hidden;
           background: #0b2b40;
           display: flex;
           align-items: center;
           justify-content: center;
+          transition: all 0.3s ease;
+        }
+
+        /* Efecto de brillo en cada cara */
+        .carousel-3d .carousel-face::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: linear-gradient(135deg, rgba(251,191,36,0.1), transparent 50%);
+          pointer-events: none;
         }
 
         .carousel-3d .carousel-face .face-content {
@@ -232,7 +268,7 @@ app.get('/tarjeta/:id', (req, res) => {
         .carousel-3d .carousel-face .placeholder-text {
           font-size: 64px;
           color: #fbbf24;
-          text-shadow: 0 0 30px rgba(251,191,36,0.3);
+          text-shadow: 0 0 40px rgba(251,191,36,0.3);
           background: #0b2b40;
           width: 100%;
           height: 100%;
@@ -248,125 +284,166 @@ app.get('/tarjeta/:id', (req, res) => {
           100% { transform: rotateY(360deg); }
         }
 
-        /* ===== INFORMACIÓN ===== */
+        /* ===== INFORMACIÓN MEJORADA ===== */
         .info {
           text-align: center;
           color: white;
-          margin: 4px 0 12px;
-          padding: 12px 10px;
-          background: rgba(0,0,0,0.3);
-          border-radius: 16px;
+          margin: 4px 0 14px;
+          padding: 16px 14px;
+          background: rgba(0,0,0,0.35);
+          border-radius: 20px;
+          border: 1px solid rgba(255,255,255,0.05);
+          position: relative;
+          z-index: 2;
+          backdrop-filter: blur(4px);
         }
         .info h2 {
-          font-size: 22px;
-          font-weight: 700;
+          font-size: 24px;
+          font-weight: 800;
           color: #fbbf24;
           letter-spacing: 0.5px;
           word-break: break-word;
+          text-shadow: 0 2px 20px rgba(251,191,36,0.2);
         }
         .info p {
-          font-size: 15px;
+          font-size: 16px;
           color: #a0c4e8;
-          margin: 3px 0;
+          margin: 4px 0;
           word-break: break-word;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
         }
 
-        /* ===== BOTONES ===== */
+        /* ===== BOTONES MODERNOS ===== */
         .botones {
           display: flex;
           flex-wrap: wrap;
-          gap: 8px;
+          gap: 10px;
           justify-content: center;
-          margin: 8px 0 12px;
+          margin: 12px 0 14px;
+          position: relative;
+          z-index: 2;
         }
         .botones a, .botones button {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          gap: 6px;
-          padding: 11px 16px;
+          gap: 8px;
+          padding: 14px 20px;
           border-radius: 60px;
           font-weight: 700;
-          font-size: 13px;
+          font-size: 14px;
           border: none;
           text-decoration: none;
           cursor: pointer;
-          transition: all 0.25s ease;
-          box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          box-shadow: 0 4px 20px rgba(0,0,0,0.3);
           flex: 1 0 auto;
-          min-width: 80px;
+          min-width: 90px;
           touch-action: manipulation;
+          position: relative;
+          overflow: hidden;
         }
+
+        /* Efecto de brillo en botones */
+        .botones a::before, .botones button::before {
+          content: '';
+          position: absolute;
+          top: -50%;
+          left: -50%;
+          width: 200%;
+          height: 200%;
+          background: radial-gradient(circle, rgba(255,255,255,0.1), transparent 60%);
+          opacity: 0;
+          transition: opacity 0.3s ease;
+        }
+        .botones a:hover::before, .botones button:hover::before {
+          opacity: 1;
+        }
+
         .botones a:hover, .botones button:hover {
-          transform: scale(1.05);
-          box-shadow: 0 6px 24px rgba(0,0,0,0.4);
+          transform: translateY(-2px) scale(1.03);
+          box-shadow: 0 8px 32px rgba(0,0,0,0.4);
         }
         .botones a:active, .botones button:active {
-          transform: scale(0.96);
+          transform: translateY(0px) scale(0.97);
         }
-        .btn-wa { background: #25D366; color: #fff; }
-        .btn-llamar { background: #1a4b6d; color: #fff; }
-        .btn-compartir { background: #fbbf24; color: #0b1a2e; }
+        
+        .btn-wa { background: linear-gradient(135deg, #25D366, #128C7E); color: #fff; }
+        .btn-llamar { background: linear-gradient(135deg, #1a4b6d, #0d2b3f); color: #fff; }
+        .btn-compartir { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #0b1a2e; }
 
         /* ===== QR ===== */
         .qr {
           text-align: center;
-          margin: 4px 0 10px;
+          margin: 4px 0 12px;
+          position: relative;
+          z-index: 2;
         }
         .qr img {
           width: 100px;
           height: 100px;
-          border-radius: 16px;
+          border-radius: 20px;
           background: #fff;
-          padding: 6px;
-          box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+          padding: 8px;
+          box-shadow: 0 4px 24px rgba(0,0,0,0.3);
           max-width: 100%;
+          transition: transform 0.3s ease;
+        }
+        .qr img:hover {
+          transform: scale(1.05);
         }
         .qr p {
           color: #a0c4e8;
           font-size: 12px;
-          margin-top: 4px;
+          margin-top: 6px;
+          font-weight: 500;
         }
 
         /* ===== CONTROLES ===== */
         .controls {
           display: flex;
-          gap: 8px;
+          gap: 10px;
           justify-content: center;
           flex-wrap: wrap;
-          margin-top: 4px;
+          margin-top: 6px;
+          position: relative;
+          z-index: 2;
         }
         .controls button {
-          background: #fbbf24;
+          background: linear-gradient(135deg, #fbbf24, #f59e0b);
           border: none;
-          padding: 7px 20px;
+          padding: 8px 24px;
           border-radius: 30px;
           font-weight: 700;
           font-size: 13px;
           color: #0b1a2e;
           cursor: pointer;
-          transition: all 0.2s;
-          box-shadow: 0 2px 10px rgba(251,191,36,0.3);
+          transition: all 0.3s ease;
+          box-shadow: 0 2px 16px rgba(251,191,36,0.3);
           touch-action: manipulation;
         }
         .controls button:hover {
-          background: #f59e0b;
-          transform: scale(1.04);
+          transform: translateY(-2px);
+          box-shadow: 0 4px 24px rgba(251,191,36,0.4);
         }
         .controls button:active {
-          transform: scale(0.96);
+          transform: translateY(0px) scale(0.97);
         }
         .controls .info-text {
           color: #a0c4e8;
           font-size: 13px;
           display: flex;
           align-items: center;
-          padding: 0 4px;
+          padding: 0 6px;
+          font-weight: 500;
         }
 
         /* ===== RESPONSIVE PERFECTO ===== */
         @media (max-width: 480px) {
-          .container { padding: 16px 12px 16px; border-radius: 32px; }
+          .container { padding: 20px 16px 18px; border-radius: 36px; }
           
           .foto-portada, .foto-portada-placeholder { 
             width: 100px; 
@@ -379,22 +456,22 @@ app.get('/tarjeta/:id', (req, res) => {
             height: min(230px, 72vw); 
           }
           
-          .info h2 { font-size: 18px; }
+          .info h2 { font-size: 20px; }
           .info p { font-size: 14px; }
           
           .botones a, .botones button { 
             font-size: 12px; 
-            padding: 9px 12px; 
+            padding: 11px 14px; 
             min-width: 70px;
           }
           
-          .qr img { width: 80px; height: 80px; }
-          .controls button { font-size: 12px; padding: 6px 14px; }
+          .qr img { width: 85px; height: 85px; }
+          .controls button { font-size: 12px; padding: 6px 18px; }
           .controls .info-text { font-size: 12px; }
         }
 
         @media (max-width: 380px) {
-          .container { padding: 12px 8px; }
+          .container { padding: 16px 12px 14px; border-radius: 28px; }
           
           .foto-portada, .foto-portada-placeholder { 
             width: 80px; 
@@ -407,35 +484,48 @@ app.get('/tarjeta/:id', (req, res) => {
             height: min(180px, 68vw); 
           }
           
-          .info h2 { font-size: 16px; }
+          .info h2 { font-size: 17px; }
           .info p { font-size: 12px; }
           
           .botones a, .botones button { 
             font-size: 11px; 
-            padding: 7px 10px; 
+            padding: 8px 12px; 
             min-width: 60px;
           }
           
           .qr img { width: 70px; height: 70px; }
-          .controls button { font-size: 11px; padding: 5px 12px; }
+          .controls button { font-size: 11px; padding: 5px 14px; }
         }
 
         @media (min-width: 768px) {
+          .container { padding: 40px 32px 32px; }
           .carousel-3d { width: 340px; height: 340px; }
-          .foto-portada, .foto-portada-placeholder { width: 150px; height: 150px; }
-          .container { padding: 32px 28px 24px; }
+          .foto-portada, .foto-portada-placeholder { width: 140px; height: 140px; }
+          .info h2 { font-size: 28px; }
         }
 
         @media (min-width: 1024px) {
           .carousel-3d { width: 380px; height: 380px; }
-          .foto-portada, .foto-portada-placeholder { width: 160px; height: 160px; }
+          .foto-portada, .foto-portada-placeholder { width: 150px; height: 150px; }
         }
 
-        /* ===== MEJORAS DE ACCESIBILIDAD ===== */
+        /* ===== ACCESIBILIDAD ===== */
         @media (prefers-reduced-motion: reduce) {
           .carousel-3d {
             animation-duration: 40s !important;
           }
+        }
+
+        /* ===== SCROLLBAR PERSONALIZADA ===== */
+        ::-webkit-scrollbar {
+          width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+          background: #fbbf24;
+          border-radius: 20px;
         }
       </style>
     </head>
