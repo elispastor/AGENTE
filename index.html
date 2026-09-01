@@ -2,129 +2,169 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-  <title>SAI - Tarjeta Digital</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SAI Digital - Tarjeta SAI</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, system-ui, sans-serif; }
-    body { background: #0a1a2e; min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 16px; }
-    .container { max-width: 500px; width: 100%; background: #ffffff; border-radius: 32px; padding: 24px; box-shadow: 0 25px 50px -8px rgba(0,0,0,0.6); }
+    body { font-family: Arial; max-width: 600px; margin: 20px auto; padding: 16px; background: #f5f5f5; }
+    h1 { color: #0b2b40; text-align: center; font-size: 24px; }
+    #chat { border: 1px solid #ddd; height: 200px; overflow-y: scroll; padding: 10px; margin-bottom: 10px; background: white; border-radius: 10px; font-size: 14px; }
+    #input { width: 75%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; }
+    #send { padding: 10px 16px; background: #0b2b40; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; }
+    .user { background: #e1f5fe; padding: 8px; margin: 4px 0; border-radius: 8px; }
+    .bot { background: #f0f0f0; padding: 8px; margin: 4px 0; border-radius: 8px; }
+    .input-area { display: flex; gap: 8px; flex-wrap: wrap; }
+    .input-area input { flex: 1; min-width: 150px; }
 
-    .banner { margin-bottom: 20px; border-radius: 16px; overflow: hidden; }
-    .banner img { width: 100%; height: auto; display: block; }
+    #formulario-sai { background: white; padding: 16px; border-radius: 10px; margin-top: 20px; border: 1px solid #ddd; }
+    #formulario-sai h2 { font-size: 20px; margin-top: 0; }
+    #formulario-sai input, #formulario-sai button { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px; box-sizing: border-box; }
+    #formulario-sai button { background: #0b2b40; color: white; border: none; cursor: pointer; }
+    #formulario-sai button:hover { background: #1a4a60; }
+    #mensaje { margin-top: 12px; font-weight: bold; }
 
-    h1 { text-align: center; color: #0b2b40; font-size: 28px; margin-bottom: 8px; }
-    h1 span { color: #fbbf24; }
-    .sub { text-align: center; color: #4a5e72; font-size: 14px; margin-bottom: 24px; }
-
-    .form-group { margin-bottom: 16px; }
-    .form-group label { font-weight: 600; color: #0b2b40; display: block; margin-bottom: 4px; }
-    .form-group input, .form-group button { width: 100%; padding: 14px; border: 1px solid #ccd9e0; border-radius: 12px; font-size: 16px; background: #fff; }
-    .form-group small { display: block; color: #6b7f93; font-size: 12px; margin-top: 4px; }
-    .form-group button { background: #0b2b40; color: white; font-weight: 700; border: none; cursor: pointer; }
-    .form-group button:hover { background: #1a4a60; }
-
-    #mensaje { margin-top: 16px; font-weight: 600; text-align: center; }
-
-    .tarjeta-preview { display: none; margin-top: 24px; padding: 16px; background: #e8f5e9; border-radius: 16px; border: 1px solid #4caf50; }
-    .tarjeta-preview h3 { color: #0b2b40; margin-bottom: 8px; }
-    .tarjeta-preview .datos { font-size: 15px; }
-    .tarjeta-preview .enlace a { word-break: break-all; color: #0b2b40; }
+    #tarjeta-generada { display: none; margin-top: 20px; padding: 16px; background: #e8f5e9; border-radius: 10px; border: 1px solid #4caf50; }
+    #tarjeta-generada h3 { margin-top: 0; }
+    .file-label { display: block; margin: 8px 0 4px; font-weight: bold; font-size: 14px; color: #0b2b40; }
+    .file-hint { font-size: 12px; color: #666; margin-bottom: 8px; display: block; }
   </style>
 </head>
 <body>
+  <h1>🧠 SAI Digital</h1>
 
-<div class="container">
-
-  <!-- ===== NUEVA PORTADA CON LA LANDING PAGE ===== -->
-  <div class="banner">
-    <img src="landing.jpg" alt="Guía Digital - Tarjeta SAI">
+  <!-- CHAT -->
+  <div id="chat"></div>
+  <div class="input-area">
+    <input type="text" id="input" placeholder="Escribe tu mensaje...">
+    <button id="send">Enviar</button>
   </div>
-
-  <h1>SAI <span>Digital</span></h1>
-  <p class="sub">Crea tu tarjeta con fotos y carrusel</p>
 
   <!-- FORMULARIO -->
-  <form id="formularioSAI" enctype="multipart/form-data">
-    <div class="form-group">
-      <label>👤 Nombre completo</label>
-      <input type="text" id="nombre" name="nombre" required>
-    </div>
-    <div class="form-group">
-      <label>📱 Teléfono / WhatsApp</label>
-      <input type="tel" id="telefono" name="telefono" required>
-    </div>
-    <div class="form-group">
-      <label>📧 Correo electrónico</label>
-      <input type="email" id="email" name="email" required>
-    </div>
+  <div id="formulario-sai">
+    <h2>📋 Crea tu tarjeta</h2>
+    <form id="formularioRegistro" enctype="multipart/form-data">
+      <input type="text" id="nombre" placeholder="Nombre completo" required>
+      <input type="tel" id="telefono" placeholder="Teléfono / WhatsApp" required>
+      <input type="email" id="email" placeholder="Correo electrónico">
+      
+      <label class="file-label">📸 Foto de portada</label>
+      <input type="file" id="fotoPortada" accept="image/*">
+      <span class="file-hint">Esta imagen aparecerá al inicio de tu tarjeta.</span>
 
-    <div class="form-group">
-      <label>📸 Foto de portada</label>
-      <input type="file" id="fotoPortada" name="fotoPortada" accept="image/*">
-      <small>Esta imagen aparecerá al inicio de tu tarjeta.</small>
-    </div>
+      <label class="file-label">🖼️ Fotos para carrusel (máximo 5)</label>
+      <input type="file" id="fotosCarrusel" accept="image/*" multiple>
+      <span class="file-hint">Estas imágenes se mostrarán en un carrusel dentro de tu tarjeta.</span>
 
-    <div class="form-group">
-      <label>🖼️ Fotos para carrusel (máximo 5)</label>
-      <input type="file" id="fotosCarrusel" name="fotosCarrusel" accept="image/*" multiple>
-      <small>Estas imágenes se mostrarán en un carrusel dentro de tu tarjeta.</small>
-    </div>
-
-    <div class="form-group">
       <button type="submit">🚀 Generar mi tarjeta</button>
+    </form>
+    <div id="mensaje"></div>
+
+    <div id="tarjeta-generada">
+      <h3>🧾 Tu tarjeta SAI</h3>
+      <p id="tarjeta-contenido"></p>
+      <p>🔗 Comparte tu enlace: <a id="enlace-tarjeta" href="#" target="_blank">Clic aquí</a></p>
     </div>
-  </form>
-
-  <div id="mensaje"></div>
-
-  <div class="tarjeta-preview" id="tarjetaPreview">
-    <h3>🧾 Tu tarjeta SAI</h3>
-    <div class="datos" id="datosTarjeta"></div>
-    <div class="enlace" id="enlaceTarjeta"></div>
   </div>
-</div>
 
-<script>
-  document.getElementById('formularioSAI').addEventListener('submit', async function(e) {
-    e.preventDefault();
+  <script>
+    // ===== CHAT =====
+    const chat = document.getElementById('chat');
+    const input = document.getElementById('input');
+    const send = document.getElementById('send');
 
-    const mensaje = document.getElementById('mensaje');
-    mensaje.textContent = '⏳ Generando...';
-    mensaje.style.color = 'black';
+    function addMessage(text, type) {
+      const div = document.createElement('div');
+      div.className = type;
+      div.textContent = text;
+      chat.appendChild(div);
+      chat.scrollTop = chat.scrollHeight;
+    }
 
-    const formData = new FormData(this);
+    async function sendMessage() {
+      const message = input.value.trim();
+      if (!message) return;
+      addMessage(message, 'user');
+      input.value = '';
 
-    try {
-      const response = await fetch('/api/generar-tarjeta', {
-        method: 'POST',
-        body: formData
-      });
+      try {
+        const response = await fetch('/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ mensaje: message })
+        });
+        const data = await response.json();
+        addMessage(data.respuesta || 'No pude procesar tu mensaje.', 'bot');
+      } catch (error) {
+        addMessage('Error de conexión', 'bot');
+      }
+    }
 
-      if (!response.ok) {
-        throw new Error(`Error HTTP: ${response.status}`);
+    send.addEventListener('click', sendMessage);
+    input.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') sendMessage();
+    });
+
+    addMessage('👋 ¡Hola! Soy MAP, tu agente SAI. ¿Cómo puedo ayudarte?', 'bot');
+
+    // ===== FORMULARIO SAI =====
+    document.getElementById('formularioRegistro').addEventListener('submit', async function (event) {
+      event.preventDefault();
+
+      const mensaje = document.getElementById('mensaje');
+      const nombre = document.getElementById('nombre').value.trim();
+      const telefono = document.getElementById('telefono').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const fotoPortada = document.getElementById('fotoPortada').files[0];
+      const fotosCarrusel = document.getElementById('fotosCarrusel').files;
+
+      mensaje.textContent = 'Generando tarjeta...';
+      mensaje.style.color = 'black';
+
+      const formData = new FormData();
+      formData.append('nombre', nombre);
+      formData.append('telefono', telefono);
+      formData.append('email', email);
+      if (fotoPortada) formData.append('fotoPortada', fotoPortada);
+      for (let i = 0; i < Math.min(fotosCarrusel.length, 5); i++) {
+        formData.append('fotosCarrusel', fotosCarrusel[i]);
       }
 
-      const resultado = await response.json();
+      try {
+        const response = await fetch('/api/generar-tarjeta', {
+          method: 'POST',
+          body: formData
+        });
 
-      mensaje.textContent = '✅ Tarjeta generada exitosamente.';
-      mensaje.style.color = 'green';
+        const resultado = await response.json();
 
-      const preview = document.getElementById('tarjetaPreview');
-      document.getElementById('datosTarjeta').innerHTML = `
-        <p><strong>Nombre:</strong> ${resultado.tarjeta.nombre}</p>
-        <p><strong>Teléfono:</strong> ${resultado.tarjeta.telefono}</p>
-        <p><strong>Correo:</strong> ${resultado.tarjeta.email}</p>
-      `;
-      document.getElementById('enlaceTarjeta').innerHTML = `<a href="${resultado.enlace}" target="_blank">🔗 Ver tarjeta completa</a>`;
-      preview.style.display = 'block';
+        if (!response.ok) {
+          throw new Error(resultado.error || 'Error al generar la tarjeta');
+        }
 
-    } catch (error) {
-      console.error('Error:', error);
-      mensaje.textContent = '❌ Error al generar la tarjeta.';
-      mensaje.style.color = 'red';
-    }
-  });
-</script>
+        mensaje.textContent = resultado.mensaje;
+        mensaje.style.color = 'green';
 
+        const tarjetaDiv = document.getElementById('tarjeta-generada');
+        const tarjetaContenido = document.getElementById('tarjeta-contenido');
+        const enlaceTarjeta = document.getElementById('enlace-tarjeta');
+
+        tarjetaContenido.innerHTML = `
+          👤 <strong>Nombre:</strong> ${nombre}<br>
+          📱 <strong>Teléfono:</strong> ${telefono}<br>
+          📧 <strong>Correo:</strong> ${email}<br>
+          ✅ Tarjeta generada con éxito.
+        `;
+        enlaceTarjeta.href = resultado.enlace;
+        enlaceTarjeta.textContent = resultado.enlace;
+        tarjetaDiv.style.display = 'block';
+
+        this.reset();
+
+      } catch (error) {
+        console.error('Error:', error);
+        mensaje.textContent = '❌ Error: ' + error.message;
+        mensaje.style.color = 'red';
+      }
+    });
+  </script>
 </body>
 </html>
