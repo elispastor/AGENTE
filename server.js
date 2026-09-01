@@ -31,7 +31,6 @@ const conversaciones = {};
 // BASE DE CONOCIMIENTO TDI - PULPO 🐙
 // ======================================================
 const conocimiento = {
-  // === BIENVENIDA PREMIUM ===
   'hola': `¡Hola! Soy PULPO 🐙, tu asistente personal del TDI (Tarjeta Digital Inteligente). 
 
 Estoy aquí para ayudarte a darle presencia digital a tu negocio, emprendimiento o profesión, de forma rápida, sencilla y sin necesidad de experiencia técnica.
@@ -56,7 +55,6 @@ Pulpo contento, con café virtual en una mano y los otros 7 brazos listos para a
 
 Cuéntame, ¿qué necesitas saber del TDI? Estoy aquí para ayudarte a dar el salto digital. 💪`,
 
-  // === PRESENTACIÓN ===
   'quien eres': `¡Soy PULPO! 🐙 Tu agente digital del TDI (Tarjeta Digital Inteligente). 
 
 Estoy aquí para ayudarte a tener presencia digital, generar ingresos pasivos y atender a tus clientes como un profesional. 
@@ -67,7 +65,6 @@ Piensa en mí como tu asistente personal con 8 brazos, siempre listo para servir
 
 Estoy aquí 24/7 para atender a tus prospectos y clientes, como un asistente digital con 8 brazos para servirte. Siempre con una sonrisa y con la mejor actitud. 🐙`,
 
-  // === QUÉ ES TDI ===
   'que es tdi': `El TDI (Tarjeta Digital Inteligente) es un ecosistema digital que permite a cualquier negocio, emprendimiento o profesional tener presencia en línea con una tarjeta digital inteligente, visibilidad en la Guía Digital de Cúcuta y la posibilidad de generar ingresos a través de un sistema de referidos.
 
 Es la forma más inteligente y accesible de dar el salto digital. ¿Te gustaría saber más? 🚀`,
@@ -76,7 +73,6 @@ Es la forma más inteligente y accesible de dar el salto digital. ¿Te gustaría
 
 Es la forma más inteligente y accesible de dar el salto digital. ¿Te gustaría saber más? 🚀`,
 
-  // === CÓMO HACER LA TARJETA ===
   'como hago la tarjeta': `¡Hacer tu tarjeta TDI es muy fácil! 🐙
 
 Solo tienes que:
@@ -104,7 +100,6 @@ Solo tienes que:
 
 ¡Y listo! El sistema genera tu tarjeta digital automáticamente. ¿Quieres que te guíe paso a paso mientras lo haces?`,
 
-  // === PRECIOS ===
   'precio': `¡Excelente pregunta! 🐙
 
 Los precios TDI son:
@@ -159,7 +154,6 @@ Los precios TDI son:
 
 La tarjeta digital es GRATIS, pagas por la visibilidad en la Guía Digital. ¿Cuál te llama más la atención?`,
 
-  // === PLANES ===
   'plan basico': `📌 Plan Básico TDI: $25.000 al año
 
 Incluye:
@@ -196,7 +190,6 @@ Incluye:
 
 Tu negocio atendido por inteligencia artificial las 24 horas, los 7 días de la semana. ¡Es como tener un asistente personal siempre disponible!`,
 
-  // === GRATIS ===
   'tarjeta gratis': `¡Así es! 🐙
 
 La tarjeta digital TDI es completamente GRATIS. Puedes generarla sin costo y ver cómo funciona.
@@ -209,7 +202,6 @@ La tarjeta digital TDI es completamente GRATIS. Puedes generarla sin costo y ver
 
 El costo es por la visibilidad en la Guía Digital de Cúcuta, desde $25.000 al año. ¿Te gustaría generar la tuya ahora y luego decidir el plan?`,
 
-  // === BENEFICIOS ===
   'beneficios': `¡Los beneficios del TDI son muchos! 🐙
 
 ✅ Presencia digital profesional
@@ -240,7 +232,6 @@ El costo es por la visibilidad en la Guía Digital de Cúcuta, desde $25.000 al 
 
 Todo en un solo ecosistema. ¿Te parece interesante? 🐙`,
 
-  // === PREGUNTAS FRECUENTES ===
   'que es la tarjeta digital': `Es una tarjeta digital inteligente con:
 ✅ Código QR para compartir
 ✅ Botones de acción (WhatsApp, llamar, compartir)
@@ -298,7 +289,6 @@ Haz que tu negocio sea encontrado en la Guía Digital de Cúcuta. La tarjeta es 
 
 PULPO 🐙 está listo para ayudarte en cada paso. ¡No esperes más, el momento es ahora!`,
 
-  // === DESPEDIDAS PREMIUM ===
   'gracias': `¡De nada! Ha sido un placer atenderte. 🐙
 
 Si necesitas más información sobre el TDI, aquí estoy con mis 8 brazos listos para servirte.
@@ -321,7 +311,6 @@ Si tienes dudas más adelante, aquí me tienes. Siempre con una sonrisa y con lo
 
 ¡Éxito con tu negocio! 💪`,
 
-  // === DIVERSIÓN Y CALIDEZ ===
   'bingo': `¡BINGO! 🎵
 
 B-I-N-G-O, B-I-N-G-O, ¡y Bingo fue su nombre! 😄
@@ -436,7 +425,7 @@ app.post('/api/generar-tarjeta', upload.any(), (req, res) => {
 });
 
 // ======================================================
-// RUTA: Ver tarjeta con CARRUSEL 3D
+// RUTA: Ver tarjeta con CARRUSEL 3D Y MÚSICA
 // ======================================================
 app.get('/tarjeta/:id', (req, res) => {
   const tarjeta = tarjetas[req.params.id];
@@ -808,144 +797,36 @@ app.get('/tarjeta/:id', (req, res) => {
           font-weight: 500;
         }
 
+        /* ===== MÚSICA ===== */
+        .music-control {
+          text-align: center;
+          margin: 8px 0 4px;
+          position: relative;
+          z-index: 2;
+        }
+        .btn-musica {
+          background: rgba(251,191,36,0.15);
+          border: 1px solid rgba(251,191,36,0.25);
+          color: #a0c4e8;
+          padding: 6px 18px;
+          border-radius: 30px;
+          font-size: 12px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          touch-action: manipulation;
+        }
+        .btn-musica:hover {
+          background: rgba(251,191,36,0.25);
+          transform: scale(1.04);
+        }
+        .btn-musica.activo {
+          background: rgba(251,191,36,0.25);
+          border-color: #fbbf24;
+          color: #fbbf24;
+        }
+
         @media (max-width: 480px) {
           .container { padding: 20px 16px 18px; border-radius: 36px; }
           .foto-portada, .foto-portada-placeholder { width: 100px; height: 100px; }
           .foto-portada-placeholder { font-size: 40px; }
-          .carousel-3d { width: min(230px, 72vw); height: min(230px, 72vw); }
-          .info h2 { font-size: 20px; }
-          .info p { font-size: 14px; }
-          .botones a, .botones button { font-size: 12px; padding: 11px 14px; min-width: 70px; }
-          .qr img { width: 85px; height: 85px; }
-          .controls button { font-size: 12px; padding: 6px 18px; }
-          .controls .info-text { font-size: 12px; }
-        }
-
-        @media (max-width: 380px) {
-          .container { padding: 16px 12px 14px; border-radius: 28px; }
-          .foto-portada, .foto-portada-placeholder { width: 80px; height: 80px; }
-          .foto-portada-placeholder { font-size: 32px; }
-          .carousel-3d { width: min(180px, 68vw); height: min(180px, 68vw); }
-          .info h2 { font-size: 17px; }
-          .info p { font-size: 12px; }
-          .botones a, .botones button { font-size: 11px; padding: 8px 12px; min-width: 60px; }
-          .qr img { width: 70px; height: 70px; }
-          .controls button { font-size: 11px; padding: 5px 14px; }
-        }
-
-        @media (min-width: 768px) {
-          .container { padding: 40px 32px 32px; }
-          .carousel-3d { width: 340px; height: 340px; }
-          .foto-portada, .foto-portada-placeholder { width: 140px; height: 140px; }
-          .info h2 { font-size: 28px; }
-        }
-
-        @media (min-width: 1024px) {
-          .carousel-3d { width: 380px; height: 380px; }
-          .foto-portada, .foto-portada-placeholder { width: 150px; height: 150px; }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          .carousel-3d {
-            animation-duration: 40s !important;
-          }
-        }
-
-        ::-webkit-scrollbar {
-          width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-          background: #fbbf24;
-          border-radius: 20px;
-        }
-      </style>
-    </head>
-    <body>
-      <div class="container">
-
-        <div class="foto-portada-wrapper">
-          ${fotoPortadaURL ? `
-            <div class="foto-portada">
-              <img src="${fotoPortadaURL}" alt="Logo de ${tarjeta.nombre}">
-            </div>
-          ` : `
-            <div class="foto-portada-placeholder">🖼️</div>
-          `}
-        </div>
-
-        <div class="carousel-wrapper">
-          <div class="carousel-3d" id="carousel3d">
-            ${carruselHTML}
-          </div>
-        </div>
-
-        <div class="info">
-          <h2>🧾 ${tarjeta.nombre}</h2>
-          <p>📱 ${tarjeta.telefono}</p>
-          <p>📧 ${tarjeta.email}</p>
-        </div>
-
-        <div class="botones">
-          <a href="https://wa.me/${tarjeta.telefono}" target="_blank" class="btn-wa">💬 WhatsApp</a>
-          <a href="tel:${tarjeta.telefono}" class="btn-llamar">📞 Llamar</a>
-          <button class="btn-compartir" onclick="compartir()">🔗 Compartir</button>
-        </div>
-
-        <div class="qr">
-          <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(tarjeta.enlace)}" alt="Código QR">
-          <p>📲 Escanea para ver la tarjeta</p>
-        </div>
-
-        <div class="controls">
-          <span class="info-text">🔄 Giro automático</span>
-          <button id="btnPausar">⏸ Pausar</button>
-          <button id="btnReanudar">▶ Reanudar</button>
-        </div>
-
-      </div>
-
-      <script>
-        const carousel = document.getElementById('carousel3d');
-        let paused = false;
-
-        document.getElementById('btnPausar').addEventListener('click', function() {
-          if (!paused) {
-            carousel.style.animationPlayState = 'paused';
-            paused = true;
-          }
-        });
-
-        document.getElementById('btnReanudar').addEventListener('click', function() {
-          if (paused) {
-            carousel.style.animationPlayState = 'running';
-            paused = false;
-          }
-        });
-
-        function compartir() {
-          const url = window.location.href;
-          if (navigator.share) {
-            navigator.share({ title: 'Tarjeta TDI', url: url });
-          } else {
-            navigator.clipboard.writeText(url).then(() => alert('📋 Enlace copiado. ¡Comparte tu tarjeta TDI!'));
-          }
-        }
-      </script>
-    </body>
-    </html>
-  `);
-});
-
-// ======================================================
-// Página principal
-// ======================================================
-app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/index.html');
-});
-
-app.listen(PORT, () => {
-  console.log(`✅ Servidor TDI con PULPO 🐙 en puerto ${PORT}`);
-});
+          .carousel-3d { width: min(230px, 72vw); height: min(230px, 
