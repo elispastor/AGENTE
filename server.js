@@ -2,6 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const { spawn } = require('child_process');
 
 const app = express();
 const PORT = process.env.PORT || 1880;
@@ -24,6 +25,95 @@ app.use(express.static(__dirname));
 app.use('/uploads', express.static('uploads'));
 
 const tarjetas = {};
+const conversaciones = {};
+
+// ======================================================
+// BASE DE CONOCIMIENTO DEL SAI
+// ======================================================
+const conocimiento = {
+  'que es sai': 'SAI es el Sistema de Asistencia Inteligente, una plataforma de tarjetas digitales con carrusel 3D, QR y botones de contacto.',
+  'registro': 'Para registrarte en el SAI, llena el formulario con tu nombre, teléfono y email. Recibirás tu tarjeta digital.',
+  'tarjeta': 'La tarjeta SAI es una tarjeta digital que muestra tu información de contacto, fotos en carrusel 3D, y código QR para compartir.',
+  'map': 'MAP es tu agente personal del SAI. Te guía en el registro y uso de la tarjeta digital.',
+  'ayuda': 'Puedo ayudarte con: registro en SAI, explicación de tarjetas digitales, solución de problemas.',
+  'hola': '¡Hola! Soy MAP, tu agente del SAI. ¿Cómo puedo ayudarte hoy?',
+  'gracias': '¡De nada! Estoy aquí para ayudarte con el SAI. ¿Necesitas algo más?',
+  'adios': '¡Hasta luego! Si necesitas ayuda con el SAI, aquí estaré. 😊'
+};
+
+// ======================================================
+// RUTA: CHAT CON AGENTE (CON IA)
+// ======================================================
+app.post('/chat', async (req, res) => {
+  const { mensaje, usuario = 'anonimo' } = req.body;
+  
+  if (!mensaje) {
+    return res.status(400).json({ error: 'Mensaje requerido' });
+  }
+
+  try {
+    // 1. Buscar en conocimiento local
+    const mensajeLower = mensaje.toLowerCase();
+    let respuesta = null;
+    
+    for (const [key, value] of Object.entries(conocimiento)) {
+      if (mensajeLower.includes(key)) {
+        respuesta = value;
+        break;
+      }
+    }
+
+    // 2. Si no está en conocimiento, usar IA (KeylessAI)
+    if (!respuesta) {
+      const fetch = await import('node-fetch');
+      
+      try {
+        const response = await fetch.default('https://keylessai.thryx.workers.dev/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            model: 'gpt-3.5-turbo',
+            messages: [
+              { 
+                role: 'system', 
+                content: `Eres MAP, agente del SAI. Responde en español, amable y profesional. 
+                Contexto: ${JSON.stringify(conversaciones[usuario] || [])}`
+              },
+              { role: 'user', content: mensaje }
+            ],
+            temperature: 0.7,
+            max_tokens: 150
+          })
+        });
+
+        const data = await response.json();
+        respuesta = data.choices?.[0]?.message?.content || 
+                   'No pude procesar tu mensaje. ¿Puedes intentar de nuevo?';
+        
+      } catch (error) {
+        console.error('Error en IA:', error);
+        respuesta = 'Lo siento, el sistema de IA está teniendo problemas. ¿Puedes intentar más tarde?';
+      }
+    }
+
+    // 3. Guardar conversación
+    if (!conversaciones[usuario]) conversaciones[usuario] = [];
+    conversaciones[usuario].push({ usuario: mensaje, bot: respuesta });
+    if (conversaciones[usuario].length > 10) {
+      conversaciones[usuario] = conversaciones[usuario].slice(-10);
+    }
+
+    res.json({ respuesta });
+
+  } catch (error) {
+    console.error('Error en chat:', error);
+    res.json({ 
+      respuesta: 'Lo siento, tuve un problema procesando tu mensaje. ¿Puedes intentar de nuevo?' 
+    });
+  }
+});
 
 // ======================================================
 // RUTA: Generar tarjeta con fotos
@@ -140,7 +230,6 @@ app.get('/tarjeta/:id', (req, res) => {
           overflow: hidden;
         }
 
-        /* Efecto de brillo superior */
         .container::before {
           content: '';
           position: absolute;
@@ -152,7 +241,6 @@ app.get('/tarjeta/:id', (req, res) => {
           pointer-events: none;
         }
 
-        /* ===== FOTO DE PORTADA (LOGO) ===== */
         .foto-portada-wrapper {
           display: flex;
           justify-content: center;
@@ -195,7 +283,6 @@ app.get('/tarjeta/:id', (req, res) => {
           box-shadow: 0 0 40px rgba(251,191,36,0.25);
         }
 
-        /* ===== CARRUSEL 3D PREMIUM ===== */
         .carousel-wrapper {
           perspective: 1200px;
           width: 100%;
@@ -223,9 +310,7 @@ app.get('/tarjeta/:id', (req, res) => {
           top: 4%;
           border-radius: 24px;
           overflow: hidden;
-          box-shadow: 
-            0 0 50px rgba(251,191,36,0.15),
-            inset 0 0 50px rgba(251,191,36,0.05);
+          box-shadow: 0 0 50px rgba(251,191,36,0.15), inset 0 0 50px rgba(251,191,36,0.05);
           border: 2px solid rgba(251,191,36,0.3);
           backface-visibility: hidden;
           background: #0b2b40;
@@ -235,7 +320,6 @@ app.get('/tarjeta/:id', (req, res) => {
           transition: all 0.3s ease;
         }
 
-        /* Efecto de brillo en cada cara */
         .carousel-3d .carousel-face::after {
           content: '';
           position: absolute;
@@ -284,7 +368,6 @@ app.get('/tarjeta/:id', (req, res) => {
           100% { transform: rotateY(360deg); }
         }
 
-        /* ===== INFORMACIÓN MEJORADA ===== */
         .info {
           text-align: center;
           color: white;
@@ -316,7 +399,6 @@ app.get('/tarjeta/:id', (req, res) => {
           gap: 6px;
         }
 
-        /* ===== BOTONES MODERNOS ===== */
         .botones {
           display: flex;
           flex-wrap: wrap;
@@ -347,7 +429,6 @@ app.get('/tarjeta/:id', (req, res) => {
           overflow: hidden;
         }
 
-        /* Efecto de brillo en botones */
         .botones a::before, .botones button::before {
           content: '';
           position: absolute;
@@ -375,7 +456,6 @@ app.get('/tarjeta/:id', (req, res) => {
         .btn-llamar { background: linear-gradient(135deg, #1a4b6d, #0d2b3f); color: #fff; }
         .btn-compartir { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #0b1a2e; }
 
-        /* ===== QR ===== */
         .qr {
           text-align: center;
           margin: 4px 0 12px;
@@ -402,7 +482,6 @@ app.get('/tarjeta/:id', (req, res) => {
           font-weight: 500;
         }
 
-        /* ===== CONTROLES ===== */
         .controls {
           display: flex;
           gap: 10px;
@@ -441,30 +520,14 @@ app.get('/tarjeta/:id', (req, res) => {
           font-weight: 500;
         }
 
-        /* ===== RESPONSIVE PERFECTO ===== */
         @media (max-width: 480px) {
           .container { padding: 20px 16px 18px; border-radius: 36px; }
-          
-          .foto-portada, .foto-portada-placeholder { 
-            width: 100px; 
-            height: 100px; 
-          }
+          .foto-portada, .foto-portada-placeholder { width: 100px; height: 100px; }
           .foto-portada-placeholder { font-size: 40px; }
-          
-          .carousel-3d { 
-            width: min(230px, 72vw); 
-            height: min(230px, 72vw); 
-          }
-          
+          .carousel-3d { width: min(230px, 72vw); height: min(230px, 72vw); }
           .info h2 { font-size: 20px; }
           .info p { font-size: 14px; }
-          
-          .botones a, .botones button { 
-            font-size: 12px; 
-            padding: 11px 14px; 
-            min-width: 70px;
-          }
-          
+          .botones a, .botones button { font-size: 12px; padding: 11px 14px; min-width: 70px; }
           .qr img { width: 85px; height: 85px; }
           .controls button { font-size: 12px; padding: 6px 18px; }
           .controls .info-text { font-size: 12px; }
@@ -472,27 +535,12 @@ app.get('/tarjeta/:id', (req, res) => {
 
         @media (max-width: 380px) {
           .container { padding: 16px 12px 14px; border-radius: 28px; }
-          
-          .foto-portada, .foto-portada-placeholder { 
-            width: 80px; 
-            height: 80px; 
-          }
+          .foto-portada, .foto-portada-placeholder { width: 80px; height: 80px; }
           .foto-portada-placeholder { font-size: 32px; }
-          
-          .carousel-3d { 
-            width: min(180px, 68vw); 
-            height: min(180px, 68vw); 
-          }
-          
+          .carousel-3d { width: min(180px, 68vw); height: min(180px, 68vw); }
           .info h2 { font-size: 17px; }
           .info p { font-size: 12px; }
-          
-          .botones a, .botones button { 
-            font-size: 11px; 
-            padding: 8px 12px; 
-            min-width: 60px;
-          }
-          
+          .botones a, .botones button { font-size: 11px; padding: 8px 12px; min-width: 60px; }
           .qr img { width: 70px; height: 70px; }
           .controls button { font-size: 11px; padding: 5px 14px; }
         }
@@ -509,14 +557,12 @@ app.get('/tarjeta/:id', (req, res) => {
           .foto-portada, .foto-portada-placeholder { width: 150px; height: 150px; }
         }
 
-        /* ===== ACCESIBILIDAD ===== */
         @media (prefers-reduced-motion: reduce) {
           .carousel-3d {
             animation-duration: 40s !important;
           }
         }
 
-        /* ===== SCROLLBAR PERSONALIZADA ===== */
         ::-webkit-scrollbar {
           width: 6px;
         }
@@ -532,7 +578,6 @@ app.get('/tarjeta/:id', (req, res) => {
     <body>
       <div class="container">
 
-        <!-- FOTO DE PORTADA (LOGO) -->
         <div class="foto-portada-wrapper">
           ${fotoPortadaURL ? `
             <div class="foto-portada">
@@ -543,34 +588,29 @@ app.get('/tarjeta/:id', (req, res) => {
           `}
         </div>
 
-        <!-- CARRUSEL 3D -->
         <div class="carousel-wrapper">
           <div class="carousel-3d" id="carousel3d">
             ${carruselHTML}
           </div>
         </div>
 
-        <!-- INFORMACIÓN -->
         <div class="info">
           <h2>🧾 ${tarjeta.nombre}</h2>
           <p>📱 ${tarjeta.telefono}</p>
           <p>📧 ${tarjeta.email}</p>
         </div>
 
-        <!-- BOTONES -->
         <div class="botones">
           <a href="https://wa.me/${tarjeta.telefono}" target="_blank" class="btn-wa">💬 WhatsApp</a>
           <a href="tel:${tarjeta.telefono}" class="btn-llamar">📞 Llamar</a>
           <button class="btn-compartir" onclick="compartir()">🔗 Compartir</button>
         </div>
 
-        <!-- QR -->
         <div class="qr">
           <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(tarjeta.enlace)}" alt="Código QR">
           <p>📲 Escanea para ver la tarjeta</p>
         </div>
 
-        <!-- CONTROLES -->
         <div class="controls">
           <span class="info-text">🔄 Giro automático</span>
           <button id="btnPausar">⏸ Pausar</button>
@@ -619,5 +659,5 @@ app.get('/', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`✅ Servidor SAI con TDI en puerto ${PORT}`);
+  console.log(`✅ Servidor SAI con MAP en puerto ${PORT}`);
 });
