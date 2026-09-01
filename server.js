@@ -55,7 +55,12 @@ Pulpo contento, con café virtual en una mano y los otros 7 brazos listos para a
 
 Cuéntame, ¿qué necesitas saber del TDI? Estoy aquí para ayudarte a dar el salto digital. 💪`,
 
-  'quien eres': `¡Soy PULPO! 🐙 Tu agente digital del TDI (Tarjeta Digital Inteligente). 
+  'quien eres': `¡Soy PULPO! 🐙 Tu agente digital del TDI (Tarjeta Digital
+
+'que es el tdi': `El TDI (Tarjeta Digital Inteligente) es un ecosistema digital que permite a cualquier negocio, emprendimiento o profesional tener presencia en línea con una tarjeta digital inteligente, visibilidad en la Guía Digital de Cúcuta y la posibilidad de generar ingresos a través de un sistema de referidos.
+
+Es la forma más inteligente y accesible de dar el salto digital. ¿Te gustaría saber más? 🚀`,
+ Inteligente). 
 
 Estoy aquí para ayudarte a tener presencia digital, generar ingresos pasivos y atender a tus clientes como un profesional. 
 
