@@ -26,12 +26,11 @@ app.use('/uploads', express.static('uploads'));
 const tarjetas = {};
 
 // ======================================================
-// RUTA: Generar tarjeta con fotos (USANDO upload.any())
+// RUTA: Generar tarjeta con fotos
 // ======================================================
 app.post('/api/generar-tarjeta', upload.any(), (req, res) => {
   const { nombre, telefono, email } = req.body;
 
-  // Buscar los archivos en req.files
   const fotoPortada = req.files.find(f => f.fieldname === 'fotoPortada');
   const fotosCarrusel = req.files.filter(f => f.fieldname === 'fotosCarrusel');
 
@@ -55,20 +54,20 @@ app.post('/api/generar-tarjeta', upload.any(), (req, res) => {
 });
 
 // ======================================================
-// RUTA: Ver tarjeta con CARRUSEL 3D
+// RUTA: Ver tarjeta TDI (con carrusel, botones y QR)
 // ======================================================
 app.get('/tarjeta/:id', (req, res) => {
   const tarjeta = tarjetas[req.params.id];
   if (!tarjeta) return res.status(404).send('Tarjeta no encontrada');
 
-  // Preparar las fotos para el carrusel
+  // Preparar fotos para el carrusel
   const fotos = [];
   if (tarjeta.fotoPortada) fotos.push(`/uploads/${tarjeta.fotoPortada}`);
   if (tarjeta.fotosCarrusel && tarjeta.fotosCarrusel.length > 0) {
     tarjeta.fotosCarrusel.forEach(f => fotos.push(`/uploads/${f}`));
   }
 
-  // Generar las caras del carrusel
+  // Generar caras del carrusel
   let carruselHTML = '';
   if (fotos.length > 0) {
     fotos.forEach((url, index) => {
@@ -91,12 +90,10 @@ app.get('/tarjeta/:id', (req, res) => {
     `;
   }
 
-  // Calcular el ángulo de rotación para cada cara
   const totalFotos = fotos.length || 1;
   const angulo = 360 / totalFotos;
   const translateZ = Math.min(400, Math.max(200, totalFotos * 60));
 
-  // Generar CSS dinámico para las caras
   let carasCSS = '';
   for (let i = 0; i < totalFotos; i++) {
     carasCSS += `
@@ -106,14 +103,14 @@ app.get('/tarjeta/:id', (req, res) => {
     `;
   }
 
-  // HTML de la tarjeta con carrusel 3D
+  // HTML completo con botones y QR
   res.send(`
     <!DOCTYPE html>
     <html>
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-      <title>Tarjeta SAI - Carrusel 3D</title>
+      <title>Tarjeta SAI - TDI</title>
       <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -125,7 +122,6 @@ app.get('/tarjeta/:id', (req, res) => {
           perspective: 1200px;
           padding: 20px;
           font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
-          overflow: hidden;
         }
         .container {
           max-width: 600px;
@@ -133,6 +129,11 @@ app.get('/tarjeta/:id', (req, res) => {
           display: flex;
           flex-direction: column;
           align-items: center;
+          background: rgba(255,255,255,0.05);
+          backdrop-filter: blur(8px);
+          border-radius: 36px;
+          padding: 24px;
+          border: 1px solid rgba(255,255,255,0.1);
         }
         .carousel {
           width: 280px;
@@ -140,7 +141,7 @@ app.get('/tarjeta/:id', (req, res) => {
           position: relative;
           transform-style: preserve-3d;
           animation: rotate 25s infinite linear;
-          margin: 20px auto;
+          margin: 10px auto;
         }
         .carousel figure {
           position: absolute;
@@ -192,12 +193,12 @@ app.get('/tarjeta/:id', (req, res) => {
         .controls {
           display: flex;
           gap: 16px;
-          margin-top: 24px;
+          margin-top: 12px;
         }
         .controls button {
           background: #fbbf24;
           border: none;
-          padding: 10px 24px;
+          padding: 8px 20px;
           border-radius: 30px;
           font-weight: 700;
           font-size: 14px;
@@ -221,6 +222,7 @@ app.get('/tarjeta/:id', (req, res) => {
           text-align: center;
           color: white;
           margin-top: 16px;
+          width: 100%;
         }
         .user-data h2 {
           font-size: 22px;
@@ -232,26 +234,65 @@ app.get('/tarjeta/:id', (req, res) => {
           color: #a0c4e8;
           margin: 4px 0;
         }
-        .btn-compartir {
-          margin-top: 12px;
-          background: #fbbf24;
-          border: none;
-          padding: 12px 28px;
-          border-radius: 30px;
-          font-weight: 700;
-          font-size: 16px;
-          color: #0b1a2e;
-          cursor: pointer;
-          box-shadow: 0 4px 12px rgba(251,191,36,0.3);
+
+        .acciones {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 16px;
+          margin-top: 16px;
+          width: 100%;
         }
-        .btn-compartir:hover {
-          background: #f59e0b;
+        .botones {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 12px;
+          justify-content: center;
+        }
+        .botones a, .botones button {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          padding: 12px 24px;
+          border-radius: 60px;
+          font-weight: 700;
+          font-size: 15px;
+          border: none;
+          text-decoration: none;
+          cursor: pointer;
+          transition: 0.2s;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .botones a:hover, .botones button:hover {
+          transform: scale(1.04);
+        }
+        .btn-wa { background: #25D366; color: #fff; }
+        .btn-llamar { background: #1a4b6d; color: #fff; }
+        .btn-compartir { background: #fbbf24; color: #0b1a2e; }
+
+        .qr {
+          text-align: center;
+          margin-top: 8px;
+        }
+        .qr img {
+          width: 120px;
+          height: 120px;
+          border-radius: 16px;
+          background: #fff;
+          padding: 8px;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .qr p {
+          color: #a0c4e8;
+          font-size: 13px;
+          margin-top: 4px;
         }
 
         @media (max-width: 480px) {
           .carousel { width: 220px; height: 260px; }
           .carousel figure .caption p { font-size: 14px; }
           .user-data h2 { font-size: 18px; }
+          .botones a, .botones button { font-size: 13px; padding: 10px 16px; }
         }
         @media (min-width: 768px) {
           .carousel { width: 400px; height: 420px; }
@@ -266,10 +307,21 @@ app.get('/tarjeta/:id', (req, res) => {
         </div>
 
         <div class="user-data">
-          <h2>👤 ${tarjeta.nombre}</h2>
+          <h2>🧾 ${tarjeta.nombre}</h2>
           <p>📱 ${tarjeta.telefono}</p>
           <p>📧 ${tarjeta.email}</p>
-          <button class="btn-compartir" onclick="compartir()">🔗 Compartir tarjeta</button>
+        </div>
+
+        <div class="acciones">
+          <div class="botones">
+            <a href="https://wa.me/${tarjeta.telefono}" target="_blank" class="btn-wa">💬 WhatsApp</a>
+            <a href="tel:${tarjeta.telefono}" class="btn-llamar">📞 Llamar</a>
+            <button class="btn-compartir" onclick="compartir()">🔗 Compartir</button>
+          </div>
+          <div class="qr">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(tarjeta.enlace)}" alt="Código QR">
+            <p>Escanea para ver la tarjeta</p>
+          </div>
         </div>
 
         <div class="controls">
@@ -319,5 +371,5 @@ app.get('/', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`✅ Servidor SAI con carrusel 3D en puerto ${PORT}`);
+  console.log(`✅ Servidor SAI con TDI en puerto ${PORT}`);
 });
