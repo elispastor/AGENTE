@@ -6,16 +6,7 @@ const fs = require('fs');
 const app = express();
 const PORT = process.env.PORT || 1880;
 
-// =============================================
-// CONFIGURACIÓN DE GEMINI (si tienes la API key)
-// =============================================
-// Descomenta estas líneas cuando tengas la API key de Gemini
-// const { GoogleGenerativeAI } = require('@google/generative-ai');
-// const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'TU_API_KEY_AQUI';
-// const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-// const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
-
-// Configurar almacenamiento
+// Configurar almacenamiento de archivos
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const dir = './uploads';
@@ -35,51 +26,35 @@ app.use('/uploads', express.static('uploads'));
 const tarjetas = {};
 
 // =============================================
-// RUTA: CHAT CON PULPO (RESPUESTA SIMULADA POR AHORA)
+// RUTA: CHAT CON PULPO (sin Gemini)
 // =============================================
-app.post('/api/chat', async (req, res) => {
+app.post('/api/chat', (req, res) => {
   const { mensaje } = req.body;
 
   if (!mensaje) {
     return res.status(400).json({ error: 'Mensaje requerido' });
   }
 
-  try {
-    // Respuesta base de PULPO (sin Gemini por ahora)
-    let respuesta = '';
-    const msg = mensaje.toLowerCase();
+  let respuesta = '';
+  const msg = mensaje.toLowerCase();
 
-    if (msg.includes('hola') || msg.includes('buenas')) {
-      respuesta = '🐙 ¡Hola! Soy PULPO, tu agente del TDI. ¿Cómo puedo ayudarte a hacer crecer tu negocio hoy?';
-    } else if (msg.includes('tarjeta') || msg.includes('digital')) {
-      respuesta = '📇 ¡Excelente! Nuestra tarjeta digital es la herramienta perfecta para tu negocio. Incluye QR, botones de acción y un carrusel de fotos. ¿Quieres saber más sobre los planes?';
-    } else if (msg.includes('plan') || msg.includes('precio') || msg.includes('costo')) {
-      respuesta = '💰 Tenemos 4 planes:\n• Básico: $25.000/año\n• Intermedio: $50.000/año\n• Avanzado: $100.000/año\n• Premium: $200.000/año (incluye agente de IA)\n¿Cuál te interesa?';
-    } else if (msg.includes('guía') || msg.includes('cúcuta')) {
-      respuesta = '📍 La Guía Digital de Cúcuta es el directorio donde todos los negocios de la ciudad ya están. ¡Aparece ahí y haz que te encuentren!';
-    } else if (msg.includes('agente') || msg.includes('ia') || msg.includes('pulpo')) {
-      respuesta = '🐙 PULPO es tu agente de IA, entrenado para atender a tus clientes 24/7. Con el plan Premium, tus clientes tendrán atención instantánea.';
-    } else {
-      respuesta = '🐙 Gracias por tu mensaje. Te recomiendo visitar nuestra guía digital o preguntarme sobre tarjetas, planes o la guía de Cúcuta. ¿En qué más puedo ayudarte?';
-    }
-
-    // Si tienes Gemini, descomenta esto y comenta la respuesta simulada:
-    // const contexto = `Eres PULPO, el agente de IA del TDI...`;
-    // const prompt = `${contexto}\n\nUsuario: ${mensaje}\n\nPULPO:`;
-    // const result = await model.generateContent(prompt);
-    // const response = await result.response;
-    // const texto = response.text();
-    // res.json({ respuesta: texto });
-
-    res.json({ respuesta });
-
-  } catch (error) {
-    console.error('Error en el chat:', error);
-    res.status(500).json({ 
-      error: 'Error de conexión con el servidor',
-      respuesta: '🐙 ¡Ups! PULPO está teniendo un momento de conexión. Intenta de nuevo en unos segundos.'
-    });
+  if (msg.includes('hola') || msg.includes('buenas') || msg.includes('saludo')) {
+    respuesta = '🐙 ¡Hola! Soy PULPO, tu agente del TDI. ¿Cómo puedo ayudarte a hacer crecer tu negocio hoy?';
+  } else if (msg.includes('tarjeta') || msg.includes('digital')) {
+    respuesta = '📇 ¡Excelente! Nuestra tarjeta digital incluye QR, botones de acción y un carrusel de fotos. ¿Quieres saber más sobre los planes?';
+  } else if (msg.includes('plan') || msg.includes('precio') || msg.includes('costo') || msg.includes('pago')) {
+    respuesta = '💰 Tenemos 4 planes:\n• Básico: $25.000/año\n• Intermedio: $50.000/año\n• Avanzado: $100.000/año\n• Premium: $200.000/año (incluye agente de IA)\n¿Cuál te interesa?';
+  } else if (msg.includes('guía') || msg.includes('cúcuta') || msg.includes('directorio')) {
+    respuesta = '📍 La Guía Digital de Cúcuta es el directorio donde todos los negocios de la ciudad ya están. ¡Aparece ahí y haz que te encuentren!';
+  } else if (msg.includes('agente') || msg.includes('ia') || msg.includes('pulpo')) {
+    respuesta = '🐙 PULPO es tu agente de IA, entrenado para atender a tus clientes 24/7. Con el plan Premium, tus clientes tendrán atención instantánea.';
+  } else if (msg.includes('gracias') || msg.includes('ok') || msg.includes('vale')) {
+    respuesta = '🐙 ¡De nada! Estoy aquí para ayudarte. ¿En qué más puedo asistirte?';
+  } else {
+    respuesta = '🐙 Gracias por tu mensaje. Te recomiendo visitar nuestra guía digital o preguntarme sobre tarjetas, planes o la guía de Cúcuta. ¿En qué más puedo ayudarte?';
   }
+
+  res.json({ respuesta });
 });
 
 // =============================================
