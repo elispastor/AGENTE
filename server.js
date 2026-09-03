@@ -2,6 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+
 // =============================================
 // PERSISTENCIA DE DATOS CON ARCHIVO JSON
 // =============================================
@@ -30,9 +31,10 @@ function guardarTarjetas(tarjetas) {
   }
 }
 
-// Cargar tarjetas al iniciar
+// Cargar tarjetas al iniciar (SÓLO UNA VEZ)
 const tarjetas = cargarTarjetas();
 console.log(`📇 ${Object.keys(tarjetas).length} tarjetas cargadas`);
+
 const app = express();
 const PORT = process.env.PORT || 1880;
 
@@ -63,6 +65,11 @@ app.use((req, res, next) => {
 });
 
 // =============================================
+// BASE DE DATOS EN MEMORIA (CONVERSACIONES)
+// =============================================
+const conversaciones = {};
+
+// =============================================
 // RUTAS DE PRUEBA
 // =============================================
 app.get('/api/status', (req, res) => {
@@ -82,13 +89,7 @@ app.get('/test', (req, res) => {
 });
 
 // =============================================
-// BASE DE DATOS EN MEMORIA
-// =============================================
-const tarjetas = {};
-const conversaciones = {};
-
-// =============================================
-// RUTA: CHAT CON PULPO
+// RUTA: CHAT CON PULPO (CORREGIDA)
 // =============================================
 app.post('/chat', (req, res) => {
   const { mensaje } = req.body;
@@ -118,7 +119,7 @@ app.post('/chat', (req, res) => {
 });
 
 // =============================================
-// RUTA: Generar tarjeta
+// RUTA: Generar tarjeta (CON PERSISTENCIA)
 // =============================================
 app.post('/api/generar-tarjeta', upload.any(), (req, res) => {
   const { nombre, telefono, email } = req.body;
@@ -137,7 +138,7 @@ app.post('/api/generar-tarjeta', upload.any(), (req, res) => {
     enlace
   };
 
-  // === GUARDAR EN ARCHIVO ===
+  // Guardar en archivo
   guardarTarjetas(tarjetas);
 
   res.json({
