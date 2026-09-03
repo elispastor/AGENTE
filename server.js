@@ -129,6 +129,7 @@ app.post('/api/generar-tarjeta', upload.any(), (req, res) => {
   const enlace = `https://agente-1-w4vk.onrender.com/tarjeta/${id}`;
 
   tarjetas[id] = {
+    guardarTarjetas(tarjetas);
     nombre,
     telefono,
     email,
