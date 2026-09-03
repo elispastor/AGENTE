@@ -6,7 +6,7 @@ const fs = require('fs');
 const app = express();
 const PORT = process.env.PORT || 1880;
 
-// Configurar almacenamiento de archivos
+// Configurar almacenamiento
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const dir = './uploads';
@@ -26,7 +26,7 @@ app.use('/uploads', express.static('uploads'));
 const tarjetas = {};
 
 // =============================================
-// RUTA: CHAT CON PULPO (sin Gemini)
+// RUTA: CHAT CON PULPO
 // =============================================
 app.post('/api/chat', (req, res) => {
   const { mensaje } = req.body;
@@ -38,18 +38,16 @@ app.post('/api/chat', (req, res) => {
   let respuesta = '';
   const msg = mensaje.toLowerCase();
 
-  if (msg.includes('hola') || msg.includes('buenas') || msg.includes('saludo')) {
+  if (msg.includes('hola') || msg.includes('buenas')) {
     respuesta = '🐙 ¡Hola! Soy PULPO, tu agente del TDI. ¿Cómo puedo ayudarte a hacer crecer tu negocio hoy?';
   } else if (msg.includes('tarjeta') || msg.includes('digital')) {
     respuesta = '📇 ¡Excelente! Nuestra tarjeta digital incluye QR, botones de acción y un carrusel de fotos. ¿Quieres saber más sobre los planes?';
-  } else if (msg.includes('plan') || msg.includes('precio') || msg.includes('costo') || msg.includes('pago')) {
+  } else if (msg.includes('plan') || msg.includes('precio') || msg.includes('costo')) {
     respuesta = '💰 Tenemos 4 planes:\n• Básico: $25.000/año\n• Intermedio: $50.000/año\n• Avanzado: $100.000/año\n• Premium: $200.000/año (incluye agente de IA)\n¿Cuál te interesa?';
-  } else if (msg.includes('guía') || msg.includes('cúcuta') || msg.includes('directorio')) {
+  } else if (msg.includes('guía') || msg.includes('cúcuta')) {
     respuesta = '📍 La Guía Digital de Cúcuta es el directorio donde todos los negocios de la ciudad ya están. ¡Aparece ahí y haz que te encuentren!';
-  } else if (msg.includes('agente') || msg.includes('ia') || msg.includes('pulpo')) {
+  } else if (msg.includes('agente') || msg.includes('pulpo')) {
     respuesta = '🐙 PULPO es tu agente de IA, entrenado para atender a tus clientes 24/7. Con el plan Premium, tus clientes tendrán atención instantánea.';
-  } else if (msg.includes('gracias') || msg.includes('ok') || msg.includes('vale')) {
-    respuesta = '🐙 ¡De nada! Estoy aquí para ayudarte. ¿En qué más puedo asistirte?';
   } else {
     respuesta = '🐙 Gracias por tu mensaje. Te recomiendo visitar nuestra guía digital o preguntarme sobre tarjetas, planes o la guía de Cúcuta. ¿En qué más puedo ayudarte?';
   }
