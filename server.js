@@ -298,9 +298,7 @@ app.get('/tarjeta/:id', (req, res) => {
 
         <!-- ===== QR ===== -->
         <div class="qr">
-          <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(tarjeta.enlace)}" alt="Código QR">
-          <p>📲 Escanea para ver la tarjeta</p>
-        </div>
+         <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(tarjeta.enlace)}" alt="Código QR">
 
       </div>
 
