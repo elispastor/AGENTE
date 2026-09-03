@@ -19,12 +19,18 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
+// Middlewares
 app.use(express.json());
 app.use(express.static(__dirname));
 app.use('/uploads', express.static('uploads'));
-app.use(express.json());
-app.use(express.static(__dirname));
-app.use('/uploads', express.static('uploads'));
+
+// CORS (permitir peticiones desde cualquier origen)
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  next();
+});
 
 // ======================================================
 // RUTAS DE PRUEBA PARA GOOGLE AI STUDIO
@@ -45,20 +51,16 @@ app.get('/test', (req, res) => {
   res.send('✅ Servidor TDI funcionando correctamente');
 });
 
+// =============================================
+// BASE DE DATOS EN MEMORIA
+// =============================================
 const tarjetas = {};
 const conversaciones = {};
-// CORS
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  next();
-});
-
-const tarjetas = {};
 
 // =============================================
-// RUTA: CHAT CON PULPO
+// RUTA: CHAT CON PULPO (endpoint que usa el frontend)
 // =============================================
-app.post('/api/chat', (req, res) => {
+app.post('/chat', (req, res) => {
   const { mensaje } = req.body;
 
   if (!mensaje) {
