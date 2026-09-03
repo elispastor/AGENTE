@@ -6,6 +6,7 @@ const fs = require('fs');
 const app = express();
 const PORT = process.env.PORT || 1880;
 
+// Configurar almacenamiento
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const dir = './uploads';
@@ -24,10 +25,15 @@ app.use('/uploads', express.static('uploads'));
 
 const tarjetas = {};
 
-// CHAT - RESPUESTAS INTELIGENTES
+// =============================================
+// RUTA: CHAT CON PULPO
+// =============================================
 app.post('/api/chat', (req, res) => {
   const { mensaje } = req.body;
-  if (!mensaje) return res.status(400).json({ error: 'Mensaje requerido' });
+
+  if (!mensaje) {
+    return res.status(400).json({ error: 'Mensaje requerido' });
+  }
 
   let respuesta = '';
   const msg = mensaje.toLowerCase();
@@ -42,8 +48,6 @@ app.post('/api/chat', (req, res) => {
     respuesta = '📍 La Guía Digital de Cúcuta es el directorio donde todos los negocios de la ciudad ya están. ¡Aparece ahí y haz que te encuentren!';
   } else if (msg.includes('agente') || msg.includes('pulpo')) {
     respuesta = '🐙 PULPO es tu agente de IA, entrenado para atender a tus clientes 24/7. Con el plan Premium, tus clientes tendrán atención instantánea.';
-  } else if (msg.includes('gracias') || msg.includes('ok')) {
-    respuesta = '🐙 ¡De nada! Estoy aquí para ayudarte. ¿En qué más puedo asistirte?';
   } else {
     respuesta = '🐙 Gracias por tu mensaje. Te recomiendo visitar nuestra guía digital o preguntarme sobre tarjetas, planes o la guía de Cúcuta. ¿En qué más puedo ayudarte?';
   }
@@ -51,7 +55,9 @@ app.post('/api/chat', (req, res) => {
   res.json({ respuesta });
 });
 
-// GENERAR TARJETA
+// =============================================
+// RUTA: Generar tarjeta
+// =============================================
 app.post('/api/generar-tarjeta', upload.any(), (req, res) => {
   const { nombre, telefono, email } = req.body;
   const fotoPortada = req.files.find(f => f.fieldname === 'fotoPortada');
@@ -76,7 +82,9 @@ app.post('/api/generar-tarjeta', upload.any(), (req, res) => {
   });
 });
 
-// VER TARJETA
+// =============================================
+// RUTA: Ver tarjeta
+// =============================================
 app.get('/tarjeta/:id', (req, res) => {
   const tarjeta = tarjetas[req.params.id];
   if (!tarjeta) return res.status(404).send('Tarjeta no encontrada');
@@ -90,10 +98,18 @@ app.get('/tarjeta/:id', (req, res) => {
   let carruselHTML = '';
   if (fotos.length > 0) {
     fotos.forEach((url) => {
-      carruselHTML += `<figure><img src="${url}" alt="Foto"></figure>`;
+      carruselHTML += `
+        <figure>
+          <img src="${url}" alt="Foto">
+        </figure>
+      `;
     });
   } else {
-    carruselHTML = `<figure><img src="https://via.placeholder.com/300/fbbf24/0b2b40?text=Sube+tu+logo" alt="Sin logo"></figure>`;
+    carruselHTML = `
+      <figure>
+        <img src="https://via.placeholder.com/300/fbbf24/0b2b40?text=Sube+tu+logo" alt="Sin logo">
+      </figure>
+    `;
   }
 
   const totalFotos = fotos.length || 1;
@@ -317,6 +333,9 @@ app.get('/tarjeta/:id', (req, res) => {
   `);
 });
 
+// =============================================
+// Página principal
+// =============================================
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });
