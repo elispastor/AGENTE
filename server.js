@@ -23,10 +23,18 @@ app.use(express.json());
 app.use(express.static(__dirname));
 app.use('/uploads', express.static('uploads'));
 
+// =============================================
+// CORS - PERMITE PETICIONES DESDE CUALQUIER ORIGEN
+// =============================================
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  next();
+});
+
 const tarjetas = {};
 
 // =============================================
-// RUTA: CHAT CON PULPO (RESPUESTAS INTELIGENTES)
+// RUTA: CHAT CON PULPO
 // =============================================
 app.post('/api/chat', (req, res) => {
   const { mensaje } = req.body;
@@ -38,7 +46,6 @@ app.post('/api/chat', (req, res) => {
   let respuesta = '';
   const msg = mensaje.toLowerCase();
 
-  // Respuestas contextuales
   if (msg.includes('hola') || msg.includes('buenas') || msg.includes('saludo')) {
     respuesta = '🐙 ¡Hola! Soy PULPO, tu agente del TDI. ¿Cómo puedo ayudarte a hacer crecer tu negocio hoy?';
   } else if (msg.includes('tarjeta') || msg.includes('digital')) {
@@ -117,7 +124,7 @@ app.get('/tarjeta/:id', (req, res) => {
 
   const totalFotos = fotos.length || 1;
   const angulo = 360 / totalFotos;
-  const translateZ = Math.min(300, Math.max(150, totalFotos * 50));
+  const translateZ = 180; // VALOR FIJO - RESPONSIVO
 
   let carasCSS = '';
   for (let i = 0; i < totalFotos; i++) {
