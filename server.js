@@ -2,7 +2,37 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+// =============================================
+// PERSISTENCIA DE DATOS CON ARCHIVO JSON
+// =============================================
+const TARJETAS_FILE = './tarjetas.json';
 
+// Función para cargar tarjetas desde el archivo
+function cargarTarjetas() {
+  try {
+    if (fs.existsSync(TARJETAS_FILE)) {
+      const data = fs.readFileSync(TARJETAS_FILE, 'utf8');
+      return JSON.parse(data);
+    }
+  } catch (error) {
+    console.error('Error cargando tarjetas:', error);
+  }
+  return {};
+}
+
+// Función para guardar tarjetas en el archivo
+function guardarTarjetas(tarjetas) {
+  try {
+    fs.writeFileSync(TARJETAS_FILE, JSON.stringify(tarjetas, null, 2));
+    console.log('✅ Tarjetas guardadas en archivo');
+  } catch (error) {
+    console.error('Error guardando tarjetas:', error);
+  }
+}
+
+// Cargar tarjetas al iniciar
+const tarjetas = cargarTarjetas();
+console.log(`📇 ${Object.keys(tarjetas).length} tarjetas cargadas`);
 const app = express();
 const PORT = process.env.PORT || 1880;
 
