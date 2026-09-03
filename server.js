@@ -22,7 +22,31 @@ const upload = multer({ storage });
 app.use(express.json());
 app.use(express.static(__dirname));
 app.use('/uploads', express.static('uploads'));
+app.use(express.json());
+app.use(express.static(__dirname));
+app.use('/uploads', express.static('uploads'));
 
+// ======================================================
+// RUTAS DE PRUEBA PARA GOOGLE AI STUDIO
+// ======================================================
+app.get('/api/status', (req, res) => {
+  res.json({ 
+    status: 'online', 
+    service: 'TDI - Tarjeta Digital Inteligente',
+    version: '1.0.0',
+    endpoints: {
+      chat: '/chat',
+      generarTarjeta: '/api/generar-tarjeta'
+    }
+  });
+});
+
+app.get('/test', (req, res) => {
+  res.send('✅ Servidor TDI funcionando correctamente');
+});
+
+const tarjetas = {};
+const conversaciones = {};
 // CORS
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
