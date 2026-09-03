@@ -96,8 +96,7 @@ app.post('/api/generar-tarjeta', upload.any(), (req, res) => {
   const fotosCarrusel = req.files.filter(f => f.fieldname === 'fotosCarrusel');
 
   const id = Date.now().toString(36);
-  const enlace = `https://agente-1-w4vk.onrender.com/tarjeta/${id}`;
-
+const enlace = `/tarjeta/${id}`;
   tarjetas[id] = {
     nombre,
     telefono,
