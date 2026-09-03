@@ -6,7 +6,6 @@ const fs = require('fs');
 const app = express();
 const PORT = process.env.PORT || 1880;
 
-// Configurar almacenamiento
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const dir = './uploads';
@@ -23,30 +22,17 @@ app.use(express.json());
 app.use(express.static(__dirname));
 app.use('/uploads', express.static('uploads'));
 
-// =============================================
-// CORS - PERMITE PETICIONES DESDE CUALQUIER ORIGEN
-// =============================================
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  next();
-});
-
 const tarjetas = {};
 
-// =============================================
-// RUTA: CHAT CON PULPO
-// =============================================
+// CHAT - RESPUESTAS INTELIGENTES
 app.post('/api/chat', (req, res) => {
   const { mensaje } = req.body;
-
-  if (!mensaje) {
-    return res.status(400).json({ error: 'Mensaje requerido' });
-  }
+  if (!mensaje) return res.status(400).json({ error: 'Mensaje requerido' });
 
   let respuesta = '';
   const msg = mensaje.toLowerCase();
 
-  if (msg.includes('hola') || msg.includes('buenas') || msg.includes('saludo')) {
+  if (msg.includes('hola') || msg.includes('buenas')) {
     respuesta = '🐙 ¡Hola! Soy PULPO, tu agente del TDI. ¿Cómo puedo ayudarte a hacer crecer tu negocio hoy?';
   } else if (msg.includes('tarjeta') || msg.includes('digital')) {
     respuesta = '📇 ¡Excelente! Nuestra tarjeta digital incluye QR, botones de acción y un carrusel de fotos. ¿Quieres saber más sobre los planes?';
@@ -65,9 +51,7 @@ app.post('/api/chat', (req, res) => {
   res.json({ respuesta });
 });
 
-// =============================================
-// RUTA: Generar tarjeta
-// =============================================
+// GENERAR TARJETA
 app.post('/api/generar-tarjeta', upload.any(), (req, res) => {
   const { nombre, telefono, email } = req.body;
   const fotoPortada = req.files.find(f => f.fieldname === 'fotoPortada');
@@ -92,9 +76,7 @@ app.post('/api/generar-tarjeta', upload.any(), (req, res) => {
   });
 });
 
-// =============================================
-// RUTA: Ver tarjeta
-// =============================================
+// VER TARJETA
 app.get('/tarjeta/:id', (req, res) => {
   const tarjeta = tarjetas[req.params.id];
   if (!tarjeta) return res.status(404).send('Tarjeta no encontrada');
@@ -108,23 +90,15 @@ app.get('/tarjeta/:id', (req, res) => {
   let carruselHTML = '';
   if (fotos.length > 0) {
     fotos.forEach((url) => {
-      carruselHTML += `
-        <figure>
-          <img src="${url}" alt="Foto">
-        </figure>
-      `;
+      carruselHTML += `<figure><img src="${url}" alt="Foto"></figure>`;
     });
   } else {
-    carruselHTML = `
-      <figure>
-        <img src="https://via.placeholder.com/300/fbbf24/0b2b40?text=Sube+tu+logo" alt="Sin logo">
-      </figure>
-    `;
+    carruselHTML = `<figure><img src="https://via.placeholder.com/300/fbbf24/0b2b40?text=Sube+tu+logo" alt="Sin logo"></figure>`;
   }
 
   const totalFotos = fotos.length || 1;
   const angulo = 360 / totalFotos;
-  const translateZ = 180; // VALOR FIJO - RESPONSIVO
+  const translateZ = Math.min(300, Math.max(150, totalFotos * 50));
 
   let carasCSS = '';
   for (let i = 0; i < totalFotos; i++) {
@@ -343,9 +317,6 @@ app.get('/tarjeta/:id', (req, res) => {
   `);
 });
 
-// =============================================
-// Página principal
-// =============================================
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });
