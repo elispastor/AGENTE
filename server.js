@@ -6,7 +6,7 @@ const fs = require('fs');
 const app = express();
 const PORT = process.env.PORT || 1880;
 
-// Configurar almacenamiento de archivos
+// Configurar almacenamiento
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const dir = './uploads';
@@ -25,12 +25,11 @@ app.use('/uploads', express.static('uploads'));
 
 const tarjetas = {};
 
-// ======================================================
-// RUTA: Generar tarjeta con fotos
-// ======================================================
+// =============================================
+// RUTA: Generar tarjeta
+// =============================================
 app.post('/api/generar-tarjeta', upload.any(), (req, res) => {
   const { nombre, telefono, email } = req.body;
-
   const fotoPortada = req.files.find(f => f.fieldname === 'fotoPortada');
   const fotosCarrusel = req.files.filter(f => f.fieldname === 'fotosCarrusel');
 
@@ -53,41 +52,44 @@ app.post('/api/generar-tarjeta', upload.any(), (req, res) => {
   });
 });
 
-// ======================================================
-// RUTA: Ver tarjeta con CARRUSEL MEJORADO
-// ======================================================
+// =============================================
+// RUTA: Ver tarjeta (SIMPLIFICADA Y CORREGIDA)
+// =============================================
 app.get('/tarjeta/:id', (req, res) => {
   const tarjeta = tarjetas[req.params.id];
   if (!tarjeta) return res.status(404).send('Tarjeta no encontrada');
 
-  // Preparar fotos para el carrusel
+  // Preparar fotos para el carrusel (incluyendo la portada como logo)
   const fotos = [];
   if (tarjeta.fotoPortada) fotos.push(`/uploads/${tarjeta.fotoPortada}`);
   if (tarjeta.fotosCarrusel && tarjeta.fotosCarrusel.length > 0) {
     tarjeta.fotosCarrusel.forEach(f => fotos.push(`/uploads/${f}`));
   }
 
-  // Generar caras del carrusel (SOLO IMÁGENES)
+  // Generar carrusel (SIN SOBRECARGAR)
   let carruselHTML = '';
   if (fotos.length > 0) {
-    fotos.forEach((url) => {
+    fotos.forEach((url, index) => {
+      // La primera foto se muestra como logo destacado
+      const esLogo = index === 0;
       carruselHTML += `
-        <figure>
-          <img src="${url}" alt="Foto">
+        <figure class="${esLogo ? 'logo-destacado' : ''}">
+          <img src="${url}" alt="Foto ${index + 1}">
+          ${esLogo ? '<span class="logo-badge">⭐ LOGO</span>' : ''}
         </figure>
       `;
     });
   } else {
     carruselHTML = `
       <figure>
-        <img src="https://via.placeholder.com/400/fbbf24/0b2b40?text=Sube+una+foto" alt="Sin foto">
+        <img src="https://via.placeholder.com/300/fbbf24/0b2b40?text=Sube+tu+logo" alt="Sin logo">
       </figure>
     `;
   }
 
   const totalFotos = fotos.length || 1;
   const angulo = 360 / totalFotos;
-  const translateZ = Math.min(400, Math.max(200, totalFotos * 60));
+  const translateZ = Math.min(300, Math.max(150, totalFotos * 50));
 
   let carasCSS = '';
   for (let i = 0; i < totalFotos; i++) {
@@ -98,58 +100,60 @@ app.get('/tarjeta/:id', (req, res) => {
     `;
   }
 
-  // HTML con estructura mejorada (sin redundancia)
+  // HTML SIMPLIFICADO Y PROPORCIONADO
   res.send(`
     <!DOCTYPE html>
     <html>
     <head>
       <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-      <title>Tarjeta SAI - TDI</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Tarjeta SAI</title>
       <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-          background: linear-gradient(145deg, #0a1a2e, #1a2f44);
+          background: #0a1a2e;
           min-height: 100vh;
           display: flex;
           justify-content: center;
           align-items: center;
-          padding: 20px;
-          font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+          padding: 15px;
+          font-family: 'Segoe UI', system-ui, sans-serif;
         }
         .container {
-          max-width: 500px;
+          max-width: 420px;
           width: 100%;
           background: rgba(255,255,255,0.05);
           backdrop-filter: blur(8px);
-          border-radius: 36px;
-          padding: 24px;
+          border-radius: 28px;
+          padding: 20px;
           border: 1px solid rgba(255,255,255,0.1);
-          box-shadow: 0 25px 50px -8px rgba(0,0,0,0.6);
+          box-shadow: 0 20px 40px rgba(0,0,0,0.5);
         }
+
+        /* CARRUSEL MÁS PEQUEÑO Y PROPORCIONADO */
         .carousel-wrapper {
-          perspective: 1000px;
+          perspective: 800px;
           width: 100%;
           display: flex;
           justify-content: center;
-          margin-bottom: 20px;
+          margin-bottom: 16px;
         }
         .carousel {
-          width: 260px;
-          height: 280px;
+          width: 220px;
+          height: 220px;
           position: relative;
           transform-style: preserve-3d;
-          animation: rotate 20s infinite linear;
+          animation: rotate 18s infinite linear;
         }
         .carousel figure {
           position: absolute;
-          width: 90%;
-          height: 90%;
-          left: 5%;
-          top: 5%;
-          border-radius: 16px;
+          width: 85%;
+          height: 85%;
+          left: 7.5%;
+          top: 7.5%;
+          border-radius: 14px;
           overflow: hidden;
-          box-shadow: 0 0 30px rgba(251,191,36,0.2);
+          box-shadow: 0 0 20px rgba(251,191,36,0.15);
           border: 2px solid #fbbf24;
           backface-visibility: hidden;
           background: #0b2b40;
@@ -159,114 +163,116 @@ app.get('/tarjeta/:id', (req, res) => {
           height: 100%;
           object-fit: cover;
         }
+        .carousel figure .logo-badge {
+          position: absolute;
+          bottom: 8px;
+          right: 8px;
+          background: #fbbf24;
+          color: #0a1a2e;
+          padding: 2px 10px;
+          border-radius: 12px;
+          font-size: 10px;
+          font-weight: 700;
+        }
         ${carasCSS}
         @keyframes rotate {
           0% { transform: rotateY(0deg); }
           100% { transform: rotateY(360deg); }
         }
 
+        /* INFORMACIÓN */
         .info {
           text-align: center;
           color: white;
-          margin: 10px 0 16px;
-          padding: 12px;
+          margin: 6px 0 12px;
+          padding: 10px;
           background: rgba(0,0,0,0.3);
-          border-radius: 16px;
+          border-radius: 14px;
         }
         .info h2 {
-          font-size: 22px;
+          font-size: 20px;
           font-weight: 700;
           color: #fbbf24;
         }
         .info p {
-          font-size: 16px;
+          font-size: 14px;
           color: #a0c4e8;
-          margin: 4px 0;
+          margin: 2px 0;
         }
 
+        /* BOTONES */
         .botones {
           display: flex;
           flex-wrap: wrap;
-          gap: 10px;
+          gap: 8px;
           justify-content: center;
-          margin: 12px 0;
+          margin: 10px 0;
         }
         .botones a, .botones button {
           display: inline-flex;
           align-items: center;
-          gap: 8px;
-          padding: 12px 20px;
-          border-radius: 60px;
+          gap: 6px;
+          padding: 10px 16px;
+          border-radius: 50px;
           font-weight: 700;
-          font-size: 14px;
+          font-size: 13px;
           border: none;
           text-decoration: none;
           cursor: pointer;
           transition: 0.2s;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.3);
           flex: 1 0 auto;
           justify-content: center;
         }
         .botones a:hover, .botones button:hover {
-          transform: scale(1.04);
+          transform: scale(1.03);
         }
         .btn-wa { background: #25D366; color: #fff; }
         .btn-llamar { background: #1a4b6d; color: #fff; }
         .btn-compartir { background: #fbbf24; color: #0b1a2e; }
 
+        /* QR */
         .qr {
           text-align: center;
-          margin: 8px 0 12px;
+          margin: 6px 0 10px;
         }
         .qr img {
-          width: 110px;
-          height: 110px;
-          border-radius: 16px;
+          width: 90px;
+          height: 90px;
+          border-radius: 12px;
           background: #fff;
-          padding: 8px;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+          padding: 6px;
         }
         .qr p {
           color: #a0c4e8;
-          font-size: 13px;
-          margin-top: 4px;
+          font-size: 12px;
         }
 
+        /* CONTROLES */
         .controls {
           display: flex;
-          gap: 12px;
+          gap: 10px;
           justify-content: center;
-          margin-top: 8px;
+          margin-top: 6px;
         }
         .controls button {
           background: #fbbf24;
           border: none;
-          padding: 8px 20px;
-          border-radius: 30px;
+          padding: 6px 16px;
+          border-radius: 25px;
           font-weight: 700;
-          font-size: 14px;
+          font-size: 13px;
           color: #0b1a2e;
           cursor: pointer;
-          transition: 0.2s;
         }
         .controls button:hover {
           background: #f59e0b;
         }
-        .controls .info {
-          color: #a0c4e8;
-          font-size: 13px;
-          display: flex;
-          align-items: center;
-        }
 
         @media (max-width: 480px) {
-          .carousel { width: 200px; height: 220px; }
-          .info h2 { font-size: 18px; }
-          .botones a, .botones button { font-size: 13px; padding: 10px 14px; }
-          .qr img { width: 90px; height: 90px; }
-        }
-        @media (min-width: 768px) {
-          .carousel { width: 340px; height: 360px; }
+          .carousel { width: 180px; height: 180px; }
+          .info h2 { font-size: 17px; }
+          .botones a, .botones button { font-size: 12px; padding: 8px 12px; }
+          .qr img { width: 75px; height: 75px; }
         }
       </style>
     </head>
@@ -291,12 +297,11 @@ app.get('/tarjeta/:id', (req, res) => {
         </div>
 
         <div class="qr">
-          <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(tarjeta.enlace)}" alt="Código QR">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(tarjeta.enlace)}" alt="QR">
           <p>Escanea para ver la tarjeta</p>
         </div>
 
         <div class="controls">
-          <span class="info">🔄 Gira el carrusel</span>
           <button id="btnPausar">⏸ Pausar</button>
           <button id="btnReanudar">▶ Reanudar</button>
         </div>
@@ -325,7 +330,7 @@ app.get('/tarjeta/:id', (req, res) => {
           if (navigator.share) {
             navigator.share({ title: 'Tarjeta SAI', url: url });
           } else {
-            navigator.clipboard.writeText(url).then(() => alert('📋 Enlace copiado. ¡Comparte tu tarjeta!'));
+            navigator.clipboard.writeText(url).then(() => alert('📋 Enlace copiado'));
           }
         }
       </script>
@@ -334,13 +339,13 @@ app.get('/tarjeta/:id', (req, res) => {
   `);
 });
 
-// ======================================================
+// =============================================
 // Página principal
-// ======================================================
+// =============================================
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });
 
 app.listen(PORT, () => {
-  console.log(`✅ Servidor SAI con TDI en puerto ${PORT}`);
+  console.log(`✅ Servidor SAI corriendo en puerto ${PORT}`);
 });
