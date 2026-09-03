@@ -4,7 +4,7 @@ const path = require('path');
 const fs = require('fs');
 
 const app = express();
-const PORT = process.env.PORT || 1880;
+const PORT = process.env.PORT || 10000;
 
 // Configurar almacenamiento
 const storage = multer.diskStorage({
@@ -26,9 +26,11 @@ app.use('/uploads', express.static('uploads'));
 const tarjetas = {};
 
 // =============================================
-// RUTA: CHAT CON PULPO
+// RUTA: CHAT CON PULPO (RESPUESTA DIRECTA)
 // =============================================
 app.post('/api/chat', (req, res) => {
+  console.log('📩 Mensaje recibido:', req.body);
+  
   const { mensaje } = req.body;
 
   if (!mensaje) {
@@ -38,20 +40,23 @@ app.post('/api/chat', (req, res) => {
   let respuesta = '';
   const msg = mensaje.toLowerCase();
 
-  if (msg.includes('hola') || msg.includes('buenas')) {
+  if (msg.includes('hola') || msg.includes('buenas') || msg.includes('saludo')) {
     respuesta = '🐙 ¡Hola! Soy PULPO, tu agente del TDI. ¿Cómo puedo ayudarte a hacer crecer tu negocio hoy?';
   } else if (msg.includes('tarjeta') || msg.includes('digital')) {
     respuesta = '📇 ¡Excelente! Nuestra tarjeta digital incluye QR, botones de acción y un carrusel de fotos. ¿Quieres saber más sobre los planes?';
   } else if (msg.includes('plan') || msg.includes('precio') || msg.includes('costo')) {
     respuesta = '💰 Tenemos 4 planes:\n• Básico: $25.000/año\n• Intermedio: $50.000/año\n• Avanzado: $100.000/año\n• Premium: $200.000/año (incluye agente de IA)\n¿Cuál te interesa?';
-  } else if (msg.includes('guía') || msg.includes('cúcuta')) {
+  } else if (msg.includes('guía') || msg.includes('cúcuta') || msg.includes('directorio')) {
     respuesta = '📍 La Guía Digital de Cúcuta es el directorio donde todos los negocios de la ciudad ya están. ¡Aparece ahí y haz que te encuentren!';
-  } else if (msg.includes('agente') || msg.includes('pulpo')) {
+  } else if (msg.includes('agente') || msg.includes('pulpo') || msg.includes('ia')) {
     respuesta = '🐙 PULPO es tu agente de IA, entrenado para atender a tus clientes 24/7. Con el plan Premium, tus clientes tendrán atención instantánea.';
+  } else if (msg.includes('gracias') || msg.includes('ok')) {
+    respuesta = '🐙 ¡De nada! Estoy aquí para ayudarte. ¿En qué más puedo asistirte?';
   } else {
     respuesta = '🐙 Gracias por tu mensaje. Te recomiendo visitar nuestra guía digital o preguntarme sobre tarjetas, planes o la guía de Cúcuta. ¿En qué más puedo ayudarte?';
   }
 
+  console.log('📤 Respuesta enviada:', respuesta);
   res.json({ respuesta });
 });
 
