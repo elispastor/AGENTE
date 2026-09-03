@@ -23,6 +23,12 @@ app.use(express.json());
 app.use(express.static(__dirname));
 app.use('/uploads', express.static('uploads'));
 
+// CORS
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  next();
+});
+
 const tarjetas = {};
 
 // =============================================
@@ -83,38 +89,44 @@ app.post('/api/generar-tarjeta', upload.any(), (req, res) => {
 });
 
 // =============================================
-// RUTA: Ver tarjeta
+// RUTA: Ver tarjeta CON CARRUSEL MEJORADO
 // =============================================
 app.get('/tarjeta/:id', (req, res) => {
   const tarjeta = tarjetas[req.params.id];
   if (!tarjeta) return res.status(404).send('Tarjeta no encontrada');
 
+  // Preparar fotos
   const fotos = [];
   if (tarjeta.fotoPortada) fotos.push(`/uploads/${tarjeta.fotoPortada}`);
   if (tarjeta.fotosCarrusel && tarjeta.fotosCarrusel.length > 0) {
     tarjeta.fotosCarrusel.forEach(f => fotos.push(`/uploads/${f}`));
   }
 
+  // Generar carrusel mejorado
   let carruselHTML = '';
   if (fotos.length > 0) {
-    fotos.forEach((url) => {
+    fotos.forEach((url, index) => {
+      const esLogo = index === 0;
       carruselHTML += `
-        <figure>
-          <img src="${url}" alt="Foto">
+        <figure class="${esLogo ? 'logo-slide' : ''}">
+          <img src="${url}" alt="${esLogo ? 'Logo' : 'Foto ' + index}">
+          ${esLogo ? '<div class="logo-badge">⭐ LOGO</div>' : ''}
+          <div class="slide-number">${index + 1}/${fotos.length}</div>
         </figure>
       `;
     });
   } else {
     carruselHTML = `
       <figure>
-        <img src="https://via.placeholder.com/300/fbbf24/0b2b40?text=Sube+tu+logo" alt="Sin logo">
+        <img src="https://via.placeholder.com/400/fbbf24/0b2b40?text=Sube+tu+logo" alt="Sin logo">
+        <div class="slide-number">1/1</div>
       </figure>
     `;
   }
 
   const totalFotos = fotos.length || 1;
   const angulo = 360 / totalFotos;
-  const translateZ = Math.min(300, Math.max(150, totalFotos * 50));
+  const translateZ = Math.min(350, Math.max(200, totalFotos * 55));
 
   let carasCSS = '';
   for (let i = 0; i < totalFotos; i++) {
@@ -130,201 +142,275 @@ app.get('/tarjeta/:id', (req, res) => {
     <html>
     <head>
       <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Tarjeta SAI</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+      <title>Tarjeta SAI - TDI</title>
       <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-          background: #0a1a2e;
+          background: linear-gradient(145deg, #0a1a2e, #1a2f44);
           min-height: 100vh;
           display: flex;
           justify-content: center;
           align-items: center;
-          padding: 15px;
-          font-family: 'Segoe UI', system-ui, sans-serif;
+          padding: 20px;
+          font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
         }
         .container {
-          max-width: 420px;
+          max-width: 500px;
           width: 100%;
           background: rgba(255,255,255,0.05);
           backdrop-filter: blur(8px);
-          border-radius: 28px;
-          padding: 20px;
+          border-radius: 36px;
+          padding: 24px;
           border: 1px solid rgba(255,255,255,0.1);
-          box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+          box-shadow: 0 25px 50px -8px rgba(0,0,0,0.6);
         }
+
+        /* CARRUSEL PROFESIONAL */
         .carousel-wrapper {
-          perspective: 800px;
+          perspective: 1200px;
           width: 100%;
           display: flex;
           justify-content: center;
-          margin-bottom: 16px;
+          margin-bottom: 20px;
+          padding: 10px 0;
         }
         .carousel {
-          width: 220px;
-          height: 220px;
+          width: 280px;
+          height: 280px;
           position: relative;
           transform-style: preserve-3d;
-          animation: rotate 18s infinite linear;
+          animation: rotate 25s infinite linear;
         }
         .carousel figure {
           position: absolute;
-          width: 85%;
-          height: 85%;
-          left: 7.5%;
-          top: 7.5%;
-          border-radius: 14px;
+          width: 88%;
+          height: 88%;
+          left: 6%;
+          top: 6%;
+          border-radius: 20px;
           overflow: hidden;
-          box-shadow: 0 0 20px rgba(251,191,36,0.15);
-          border: 2px solid #fbbf24;
+          box-shadow: 0 10px 40px rgba(251, 191, 36, 0.2), 0 0 60px rgba(251, 191, 36, 0.05);
+          border: 2px solid rgba(251, 191, 36, 0.3);
           backface-visibility: hidden;
           background: #0b2b40;
+          transition: all 0.3s ease;
+        }
+        .carousel figure:hover {
+          border-color: #fbbf24;
+          box-shadow: 0 15px 50px rgba(251, 191, 36, 0.3);
         }
         .carousel figure img {
           width: 100%;
           height: 100%;
           object-fit: cover;
+          transition: transform 0.4s ease;
+        }
+        .carousel figure:hover img {
+          transform: scale(1.05);
+        }
+        .carousel figure .logo-badge {
+          position: absolute;
+          bottom: 12px;
+          right: 12px;
+          background: linear-gradient(135deg, #fbbf24, #f59e0b);
+          color: #0a1a2e;
+          padding: 4px 14px;
+          border-radius: 20px;
+          font-size: 11px;
+          font-weight: 800;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3);
+        }
+        .carousel figure .slide-number {
+          position: absolute;
+          bottom: 12px;
+          left: 12px;
+          background: rgba(0, 0, 0, 0.6);
+          color: #94a3b8;
+          padding: 3px 12px;
+          border-radius: 16px;
+          font-size: 11px;
+          font-weight: 600;
+          backdrop-filter: blur(4px);
+          border: 1px solid rgba(255, 255, 255, 0.05);
         }
         ${carasCSS}
         @keyframes rotate {
           0% { transform: rotateY(0deg); }
           100% { transform: rotateY(360deg); }
         }
+        .carousel-wrapper:hover .carousel {
+          animation-play-state: paused;
+        }
+
+        /* INFORMACIÓN */
         .info {
           text-align: center;
           color: white;
-          margin: 6px 0 12px;
-          padding: 10px;
+          margin: 8px 0 16px;
+          padding: 14px;
           background: rgba(0,0,0,0.3);
-          border-radius: 14px;
+          border-radius: 16px;
         }
         .info h2 {
-          font-size: 20px;
+          font-size: 22px;
           font-weight: 700;
           color: #fbbf24;
         }
         .info p {
-          font-size: 14px;
+          font-size: 15px;
           color: #a0c4e8;
-          margin: 2px 0;
+          margin: 4px 0;
         }
+
+        /* BOTONES */
         .botones {
           display: flex;
           flex-wrap: wrap;
-          gap: 8px;
+          gap: 10px;
           justify-content: center;
-          margin: 10px 0;
+          margin: 14px 0;
         }
         .botones a, .botones button {
           display: inline-flex;
           align-items: center;
-          gap: 6px;
-          padding: 10px 16px;
-          border-radius: 50px;
+          gap: 8px;
+          padding: 12px 20px;
+          border-radius: 60px;
           font-weight: 700;
-          font-size: 13px;
+          font-size: 14px;
           border: none;
           text-decoration: none;
           cursor: pointer;
           transition: 0.2s;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.3);
           flex: 1 0 auto;
           justify-content: center;
         }
         .botones a:hover, .botones button:hover {
-          transform: scale(1.03);
+          transform: scale(1.04);
         }
         .btn-wa { background: #25D366; color: #fff; }
         .btn-llamar { background: #1a4b6d; color: #fff; }
         .btn-compartir { background: #fbbf24; color: #0b1a2e; }
+
+        /* QR */
         .qr {
           text-align: center;
-          margin: 6px 0 10px;
+          margin: 8px 0 12px;
         }
         .qr img {
-          width: 90px;
-          height: 90px;
-          border-radius: 12px;
+          width: 100px;
+          height: 100px;
+          border-radius: 16px;
           background: #fff;
-          padding: 6px;
+          padding: 8px;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
         .qr p {
           color: #a0c4e8;
-          font-size: 12px;
+          font-size: 13px;
+          margin-top: 4px;
         }
+
+        /* CONTROLES */
         .controls {
           display: flex;
-          gap: 10px;
+          gap: 12px;
           justify-content: center;
-          margin-top: 6px;
+          margin-top: 8px;
         }
         .controls button {
           background: #fbbf24;
           border: none;
-          padding: 6px 16px;
-          border-radius: 25px;
+          padding: 8px 20px;
+          border-radius: 30px;
           font-weight: 700;
-          font-size: 13px;
+          font-size: 14px;
           color: #0b1a2e;
           cursor: pointer;
+          transition: 0.2s;
         }
         .controls button:hover {
           background: #f59e0b;
         }
+
+        /* RESPONSIVE */
         @media (max-width: 480px) {
-          .carousel { width: 180px; height: 180px; }
-          .info h2 { font-size: 17px; }
-          .botones a, .botones button { font-size: 12px; padding: 8px 12px; }
-          .qr img { width: 75px; height: 75px; }
+          .carousel { width: 200px; height: 200px; }
+          .info h2 { font-size: 18px; }
+          .botones a, .botones button { font-size: 13px; padding: 10px 14px; }
+          .qr img { width: 80px; height: 80px; }
+          .carousel figure .logo-badge { font-size: 9px; padding: 2px 10px; }
+          .carousel figure .slide-number { font-size: 9px; padding: 2px 10px; }
+        }
+        @media (min-width: 768px) {
+          .carousel { width: 340px; height: 340px; }
         }
       </style>
     </head>
     <body>
       <div class="container">
+        <!-- CARRUSEL -->
         <div class="carousel-wrapper">
           <div class="carousel" id="carousel">
             ${carruselHTML}
           </div>
         </div>
+
+        <!-- INFORMACIÓN -->
         <div class="info">
           <h2>🧾 ${tarjeta.nombre}</h2>
           <p>📱 ${tarjeta.telefono}</p>
           <p>📧 ${tarjeta.email}</p>
         </div>
+
+        <!-- BOTONES -->
         <div class="botones">
           <a href="https://wa.me/${tarjeta.telefono}" target="_blank" class="btn-wa">💬 WhatsApp</a>
           <a href="tel:${tarjeta.telefono}" class="btn-llamar">📞 Llamar</a>
           <button class="btn-compartir" onclick="compartir()">🔗 Compartir</button>
         </div>
+
+        <!-- QR -->
         <div class="qr">
           <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(tarjeta.enlace)}" alt="QR">
           <p>Escanea para ver la tarjeta</p>
         </div>
+
+        <!-- CONTROLES -->
         <div class="controls">
           <button id="btnPausar">⏸ Pausar</button>
           <button id="btnReanudar">▶ Reanudar</button>
         </div>
       </div>
+
       <script>
         const carousel = document.getElementById('carousel');
         let paused = false;
+
         document.getElementById('btnPausar').addEventListener('click', function() {
           if (!paused) {
             carousel.style.animationPlayState = 'paused';
             paused = true;
           }
         });
+
         document.getElementById('btnReanudar').addEventListener('click', function() {
           if (paused) {
             carousel.style.animationPlayState = 'running';
             paused = false;
           }
         });
+
         function compartir() {
           const url = window.location.href;
           if (navigator.share) {
             navigator.share({ title: 'Tarjeta SAI', url: url });
           } else {
-            navigator.clipboard.writeText(url).then(() => alert('📋 Enlace copiado'));
+            navigator.clipboard.writeText(url).then(() => alert('📋 Enlace copiado. ¡Comparte tu tarjeta!'));
           }
         }
       </script>
