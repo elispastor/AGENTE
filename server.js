@@ -297,99 +297,96 @@ app.get('/tarjeta/:id', (req, res) => {
         </div>
 
         <!-- ===== QR ===== -->
-        <div class="qr">
-         <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(tarjeta.enlace)}" alt="Código QR">
+        <!-- ===== QR ===== -->
+<div class="qr">
+  <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(tarjeta.enlace)}" alt="Código QR">
+  <p>📲 Escanea para ver la tarjeta</p>
+</div>
 
-      </div>
+<!-- ===== SCRIPTS ===== -->
+<script>
+  // ===== CONTROL DEL CARRUSEL =====
+  const slidesContainer = document.getElementById('carouselSlides');
+  const slides = slidesContainer.querySelectorAll('.slide');
+  const indicators = document.querySelectorAll('.indicator');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
 
-      <script>
-        // ===== CONTROL DEL CARRUSEL =====
-        const slidesContainer = document.getElementById('carouselSlides');
-        const slides = slidesContainer.querySelectorAll('.slide');
-        const indicators = document.querySelectorAll('.indicator');
-        const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        
-        let currentIndex = 0;
-        const totalSlides = slides.length;
-        let autoPlayInterval;
+  let currentIndex = 0;
+  const totalSlides = slides.length;
+  let autoPlayInterval;
 
-        function goToSlide(index) {
-          if (index < 0) index = totalSlides - 1;
-          if (index >= totalSlides) index = 0;
-          
-          currentIndex = index;
-          slidesContainer.style.transform = `translateX(-${currentIndex * 100}%)`;
-          
-          // Actualizar indicadores
-          indicators.forEach((ind, i) => {
-            ind.classList.toggle('active', i === currentIndex);
-          });
-        }
+  function goToSlide(index) {
+    if (index < 0) index = totalSlides - 1;
+    if (index >= totalSlides) index = 0;
 
-        function nextSlide() {
-          goToSlide(currentIndex + 1);
-        }
+    currentIndex = index;
+    slidesContainer.style.transform = `translateX(-${currentIndex * 100}%)`;
 
-        function prevSlide() {
-          goToSlide(currentIndex - 1);
-        }
+    indicators.forEach((ind, i) => {
+      ind.classList.toggle('active', i === currentIndex);
+    });
+  }
 
-        // Eventos de los botones
-        if (nextBtn) nextBtn.addEventListener('click', () => {
-          nextSlide();
-          resetAutoPlay();
-        });
+  function nextSlide() {
+    goToSlide(currentIndex + 1);
+  }
 
-        if (prevBtn) prevBtn.addEventListener('click', () => {
-          prevSlide();
-          resetAutoPlay();
-        });
+  function prevSlide() {
+    goToSlide(currentIndex - 1);
+  }
 
-        // Eventos de los indicadores
-        indicators.forEach((ind, i) => {
-          ind.addEventListener('click', () => {
-            goToSlide(i);
-            resetAutoPlay();
-          });
-        });
+  // Eventos
+  if (nextBtn) nextBtn.addEventListener('click', () => {
+    nextSlide();
+    resetAutoPlay();
+  });
 
-        // Auto-play
-        function startAutoPlay() {
-          autoPlayInterval = setInterval(nextSlide, 5000);
-        }
+  if (prevBtn) prevBtn.addEventListener('click', () => {
+    prevSlide();
+    resetAutoPlay();
+  });
 
-        function resetAutoPlay() {
-          clearInterval(autoPlayInterval);
-          startAutoPlay();
-        }
+  indicators.forEach((ind, i) => {
+    ind.addEventListener('click', () => {
+      goToSlide(i);
+      resetAutoPlay();
+    });
+  });
 
-        // Pausar auto-play al pasar el mouse
-        const carouselContainer = document.getElementById('carouselContainer');
-        carouselContainer.addEventListener('mouseenter', () => {
-          clearInterval(autoPlayInterval);
-        });
+  // Auto-play
+  function startAutoPlay() {
+    autoPlayInterval = setInterval(nextSlide, 5000);
+  }
 
-        carouselContainer.addEventListener('mouseleave', () => {
-          startAutoPlay();
-        });
+  function resetAutoPlay() {
+    clearInterval(autoPlayInterval);
+    startAutoPlay();
+  }
 
-        // Iniciar auto-play
-        if (totalSlides > 1) {
-          startAutoPlay();
-        }
+  const carouselContainer = document.getElementById('carouselContainer');
+  if (carouselContainer) {
+    carouselContainer.addEventListener('mouseenter', () => {
+      clearInterval(autoPlayInterval);
+    });
 
-        // ===== COMPARTIR =====
-        function compartir() {
-          const url = window.location.href;
-          if (navigator.share) {
-            navigator.share({ title: 'Tarjeta TDI', url: url });
-          } else {
-            navigator.clipboard.writeText(url).then(() => alert('📋 Enlace copiado. ¡Comparte tu tarjeta!'));
-          }
-        }
-      </script>
-    </body>
-    </html>
-  `);
+    carouselContainer.addEventListener('mouseleave', () => {
+      startAutoPlay();
+    });
+  }
+
+  if (totalSlides > 1) {
+    startAutoPlay();
+  }
+
+  // ===== COMPARTIR =====
+  function compartir() {
+    const url = window.location.href;
+    if (navigator.share) {
+      navigator.share({ title: 'Tarjeta TDI', url: url });
+    } else {
+      navigator.clipboard.writeText(url).then(() => alert('📋 Enlace copiado. ¡Comparte tu tarjeta!'));
+    }
+  }
+</script>
 });
