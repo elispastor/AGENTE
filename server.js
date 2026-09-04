@@ -857,8 +857,6 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });
 
-console.log('✅ Ruta /julio-vargas registrada correctamente');
-
 app.listen(PORT, () => {
   console.log('✅ Servidor TDI con PULPO 🐙 en puerto ' + PORT);
 });
