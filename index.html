@@ -6,7 +6,6 @@
   <title>TDI - Tarjeta Digital Inteligente</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    
     body {
       font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
       background: linear-gradient(135deg, #ff8c00, #ff6600);
@@ -16,7 +15,6 @@
       align-items: center;
       padding: 20px;
     }
-
     .container {
       max-width: 600px;
       width: 100%;
@@ -27,187 +25,41 @@
       box-shadow: 0 20px 60px rgba(0,0,0,0.3);
       border: 1px solid rgba(255,255,255,0.2);
     }
-
-    /* Portada */
-    .portada {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    .portada img {
-      width: 100%;
-      max-height: 200px;
-      object-fit: cover;
-      border-radius: 16px;
-      border: 2px solid #ff8c00;
-      box-shadow: 0 8px 24px rgba(255,140,0,0.3);
-    }
-    .portada h1 {
-      font-size: 28px;
-      color: #ff6600;
-      margin-top: 12px;
-      font-weight: 800;
-    }
-    .portada p {
-      color: #555;
-      font-size: 16px;
-      margin-top: 4px;
-    }
-
-    /* Chat */
-    .chat-container {
-      background: white;
-      border-radius: 16px;
-      border: 1px solid #e0e0e0;
-      margin-bottom: 16px;
-      overflow: hidden;
-    }
-    #chat {
-      height: 200px;
-      overflow-y: scroll;
-      padding: 12px;
-      font-size: 14px;
-      background: #fafafa;
-    }
-    .chat-input-area {
-      display: flex;
-      gap: 8px;
-      padding: 10px 12px;
-      background: #f5f5f5;
-      border-top: 1px solid #e0e0e0;
-    }
-    .chat-input-area input {
-      flex: 1;
-      padding: 10px 14px;
-      border: 1px solid #ddd;
-      border-radius: 30px;
-      font-size: 14px;
-      outline: none;
-      min-width: 100px;
-    }
-    .chat-input-area input:focus {
-      border-color: #ff8c00;
-    }
-    .chat-input-area button {
-      padding: 10px 20px;
-      background: #ff8c00;
-      color: white;
-      border: none;
-      border-radius: 30px;
-      cursor: pointer;
-      font-weight: 700;
-      font-size: 14px;
-      transition: 0.2s;
-    }
-    .chat-input-area button:hover {
-      background: #e67a00;
-      transform: scale(1.02);
-    }
+    .portada { text-align: center; margin-bottom: 20px; }
+    .portada img { width: 100%; max-height: 200px; object-fit: cover; border-radius: 16px; border: 2px solid #ff8c00; box-shadow: 0 8px 24px rgba(255,140,0,0.3); }
+    .portada h1 { font-size: 28px; color: #ff6600; margin-top: 12px; font-weight: 800; }
+    .portada p { color: #555; font-size: 16px; margin-top: 4px; }
+    .chat-container { background: white; border-radius: 16px; border: 1px solid #e0e0e0; margin-bottom: 16px; overflow: hidden; }
+    #chat { height: 200px; overflow-y: scroll; padding: 12px; font-size: 14px; background: #fafafa; }
+    .chat-input-area { display: flex; gap: 8px; padding: 10px 12px; background: #f5f5f5; border-top: 1px solid #e0e0e0; }
+    .chat-input-area input { flex: 1; padding: 10px 14px; border: 1px solid #ddd; border-radius: 30px; font-size: 14px; outline: none; min-width: 100px; }
+    .chat-input-area input:focus { border-color: #ff8c00; }
+    .chat-input-area button { padding: 10px 20px; background: #ff8c00; color: white; border: none; border-radius: 30px; cursor: pointer; font-weight: 700; font-size: 14px; transition: 0.2s; }
+    .chat-input-area button:hover { background: #e67a00; transform: scale(1.02); }
     .user { background: #fff3e0; padding: 8px 12px; margin: 4px 0; border-radius: 12px; border-left: 4px solid #ff8c00; }
     .bot { background: #f0f0f0; padding: 8px 12px; margin: 4px 0; border-radius: 12px; border-left: 4px solid #0b2b40; }
-
-    /* Formulario */
-    #formulario-sai {
-      background: white;
-      padding: 20px;
-      border-radius: 16px;
-      border: 1px solid #e0e0e0;
-      margin-top: 16px;
-    }
-    #formulario-sai h2 {
-      font-size: 22px;
-      color: #0b2b40;
-      margin-top: 0;
-      margin-bottom: 16px;
-      border-bottom: 2px solid #ff8c00;
-      padding-bottom: 8px;
-    }
-    #formulario-sai input, #formulario-sai button {
-      width: 100%;
-      padding: 12px 14px;
-      margin-bottom: 10px;
-      border: 1px solid #ddd;
-      border-radius: 30px;
-      font-size: 15px;
-      box-sizing: border-box;
-      outline: none;
-      transition: 0.2s;
-    }
-    #formulario-sai input:focus {
-      border-color: #ff8c00;
-      box-shadow: 0 0 0 3px rgba(255,140,0,0.1);
-    }
-    #formulario-sai button[type="submit"] {
-      background: #ff8c00;
-      color: white;
-      border: none;
-      cursor: pointer;
-      font-weight: 700;
-      font-size: 16px;
-      transition: 0.2s;
-    }
-    #formulario-sai button[type="submit"]:hover {
-      background: #e67a00;
-      transform: scale(1.02);
-    }
-    .file-label {
-      display: block;
-      margin: 8px 0 4px;
-      font-weight: 700;
-      font-size: 14px;
-      color: #0b2b40;
-    }
-    .file-hint {
-      font-size: 12px;
-      color: #888;
-      margin-bottom: 8px;
-      display: block;
-    }
-    #mensaje {
-      margin-top: 12px;
-      font-weight: 600;
-      text-align: center;
-    }
-
-    #tarjeta-generada {
-      display: none;
-      margin-top: 16px;
-      padding: 16px;
-      background: #e8f5e9;
-      border-radius: 12px;
-      border: 1px solid #4caf50;
-    }
-    #tarjeta-generada h3 {
-      margin-top: 0;
-      color: #2e7d32;
-    }
-    #tarjeta-generada a {
-      color: #ff8c00;
-      font-weight: 700;
-      word-break: break-all;
-    }
-
-    /* Responsive */
-    @media (max-width: 480px) {
-      .container { padding: 16px; }
-      .portada h1 { font-size: 22px; }
-      .chat-input-area input { font-size: 13px; padding: 8px 12px; }
-      .chat-input-area button { font-size: 13px; padding: 8px 16px; }
-      #formulario-sai h2 { font-size: 18px; }
-      #formulario-sai input { font-size: 14px; padding: 10px 12px; }
-    }
+    #formulario-sai { background: white; padding: 20px; border-radius: 16px; border: 1px solid #e0e0e0; margin-top: 16px; }
+    #formulario-sai h2 { font-size: 22px; color: #0b2b40; margin-top: 0; margin-bottom: 16px; border-bottom: 2px solid #ff8c00; padding-bottom: 8px; }
+    #formulario-sai input, #formulario-sai button { width: 100%; padding: 12px 14px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 30px; font-size: 15px; box-sizing: border-box; outline: none; transition: 0.2s; }
+    #formulario-sai input:focus { border-color: #ff8c00; box-shadow: 0 0 0 3px rgba(255,140,0,0.1); }
+    #formulario-sai button[type="submit"] { background: #ff8c00; color: white; border: none; cursor: pointer; font-weight: 700; font-size: 16px; transition: 0.2s; }
+    #formulario-sai button[type="submit"]:hover { background: #e67a00; transform: scale(1.02); }
+    .file-label { display: block; margin: 8px 0 4px; font-weight: 700; font-size: 14px; color: #0b2b40; }
+    .file-hint { font-size: 12px; color: #888; margin-bottom: 8px; display: block; }
+    #mensaje { margin-top: 12px; font-weight: 600; text-align: center; }
+    #tarjeta-generada { display: none; margin-top: 16px; padding: 16px; background: #e8f5e9; border-radius: 12px; border: 1px solid #4caf50; }
+    #tarjeta-generada h3 { margin-top: 0; color: #2e7d32; }
+    #tarjeta-generada a { color: #ff8c00; font-weight: 700; word-break: break-all; }
+    @media (max-width: 480px) { .container { padding: 16px; } .portada h1 { font-size: 22px; } .chat-input-area input { font-size: 13px; padding: 8px 12px; } .chat-input-area button { font-size: 13px; padding: 8px 16px; } #formulario-sai h2 { font-size: 18px; } #formulario-sai input { font-size: 14px; padding: 10px 12px; } }
   </style>
 </head>
 <body>
   <div class="container">
-
-    <!-- Portada -->
     <div class="portada">
       <img src="landing.jpg" alt="Guía Digital - TDI">
       <h1>🚀 TDI - Tarjeta Digital Inteligente</h1>
       <p>📌 Visibilidad en la Guía Digital de Cúcuta • Ingresos pasivos • Agente IA</p>
     </div>
-
-    <!-- Chat -->
     <div class="chat-container">
       <div id="chat"></div>
       <div class="chat-input-area">
@@ -215,38 +67,29 @@
         <button id="send">Enviar</button>
       </div>
     </div>
-
-    <!-- Formulario -->
     <div id="formulario-sai">
       <h2>📋 Crea tu tarjeta TDI</h2>
       <form id="formularioRegistro" enctype="multipart/form-data">
         <input type="text" id="nombre" placeholder="Nombre completo" required>
         <input type="tel" id="telefono" placeholder="Teléfono / WhatsApp" required>
         <input type="email" id="email" placeholder="Correo electrónico">
-        
         <label class="file-label">📸 Foto de portada</label>
         <input type="file" id="fotoPortada" accept="image/*">
         <span class="file-hint">Esta imagen aparecerá al inicio de tu tarjeta.</span>
-
-        <label class="file-label">🖼️ Fotos para carrusel (máximo 5)</label>
+        <label class="file-label">🖼️ Fotos para carrusel (sin límite)</label>
         <input type="file" id="fotosCarrusel" accept="image/*" multiple>
-        <span class="file-hint">Estas imágenes se mostrarán en un carrusel 3D dentro de tu tarjeta.</span>
-
+        <span class="file-hint">Puedes subir todas las fotos que quieras.</span>
         <button type="submit">🚀 Generar mi tarjeta</button>
       </form>
       <div id="mensaje"></div>
-
       <div id="tarjeta-generada">
         <h3>🧾 Tu tarjeta TDI</h3>
         <p id="tarjeta-contenido"></p>
         <p>🔗 Comparte tu enlace: <a id="enlace-tarjeta" href="#" target="_blank">Clic aquí</a></p>
       </div>
     </div>
-
   </div>
-
   <script>
-    // ===== CHAT CON PULPO (CORREGIDO) =====
     const chat = document.getElementById('chat');
     const input = document.getElementById('input');
     const send = document.getElementById('send');
@@ -264,9 +107,7 @@
       if (!message) return;
       addMessage(message, 'user');
       input.value = '';
-
       try {
-        // === URL COMPLETA DEL SERVIDOR ===
         const response = await fetch('https://agente-1-w4vk.onrender.com/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -275,7 +116,6 @@
         const data = await response.json();
         addMessage(data.respuesta || 'No pude procesar tu mensaje.', 'bot');
       } catch (error) {
-        console.error('Error en chat:', error);
         addMessage('❌ Error de conexión. Revisa tu internet.', 'bot');
       }
     }
@@ -287,10 +127,8 @@
 
     addMessage('🐙 ¡Hola! Soy PULPO, tu agente del TDI. ¿Cómo puedo ayudarte a hacer crecer tu negocio hoy?', 'bot');
 
-    // ===== FORMULARIO TDI =====
     document.getElementById('formularioRegistro').addEventListener('submit', async function (event) {
       event.preventDefault();
-
       const mensaje = document.getElementById('mensaje');
       const nombre = document.getElementById('nombre').value.trim();
       const telefono = document.getElementById('telefono').value.trim();
@@ -306,7 +144,7 @@
       formData.append('telefono', telefono);
       formData.append('email', email);
       if (fotoPortada) formData.append('fotoPortada', fotoPortada);
-      for (let i = 0; i < Math.min(fotosCarrusel.length, 5); i++) {
+      for (let i = 0; i < fotosCarrusel.length; i++) {
         formData.append('fotosCarrusel', fotosCarrusel[i]);
       }
 
@@ -315,20 +153,13 @@
           method: 'POST',
           body: formData
         });
-
         const resultado = await response.json();
-
-        if (!response.ok) {
-          throw new Error(resultado.error || 'Error al generar la tarjeta');
-        }
-
+        if (!response.ok) throw new Error(resultado.error || 'Error al generar la tarjeta');
         mensaje.textContent = resultado.mensaje;
         mensaje.style.color = 'green';
-
         const tarjetaDiv = document.getElementById('tarjeta-generada');
         const tarjetaContenido = document.getElementById('tarjeta-contenido');
         const enlaceTarjeta = document.getElementById('enlace-tarjeta');
-
         tarjetaContenido.innerHTML = `
           👤 <strong>Nombre:</strong> ${nombre}<br>
           📱 <strong>Teléfono:</strong> ${telefono}<br>
@@ -338,9 +169,7 @@
         enlaceTarjeta.href = resultado.enlace;
         enlaceTarjeta.textContent = resultado.enlace;
         tarjetaDiv.style.display = 'block';
-
         this.reset();
-
       } catch (error) {
         console.error('Error:', error);
         mensaje.textContent = '❌ Error: ' + error.message;
