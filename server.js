@@ -29,13 +29,14 @@ function guardarTarjetas(tarjetas) {
   }
 }
 
+// Cargar tarjetas al iniciar
 const tarjetas = cargarTarjetas();
 console.log(`📇 ${Object.keys(tarjetas).length} tarjetas cargadas`);
 
 const app = express();
 const PORT = process.env.PORT || 1880;
 
-// Configurar almacenamiento
+// Configurar almacenamiento de archivos
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const dir = './uploads';
@@ -70,7 +71,7 @@ app.get('/api/status', (req, res) => {
   res.json({
     status: 'online',
     service: 'TDI - Tarjeta Digital Inteligente',
-    version: '2.0.0',
+    version: '2.1.0',
     endpoints: {
       chat: '/chat',
       generarTarjeta: '/api/generar-tarjeta'
@@ -115,7 +116,7 @@ app.post('/chat', (req, res) => {
 });
 
 // =============================================
-// RUTA: GENERAR TARJETA (CON DOMINIO Y FOTOS ILIMITADAS)
+// RUTA: GENERAR TARJETA (CON PERSISTENCIA JSON)
 // =============================================
 app.post('/api/generar-tarjeta', upload.any(), (req, res) => {
   const { nombre, telefono, email } = req.body;
@@ -135,6 +136,7 @@ app.post('/api/generar-tarjeta', upload.any(), (req, res) => {
     fecha: new Date().toISOString()
   };
 
+  // Guardar en archivo JSON
   guardarTarjetas(tarjetas);
 
   res.json({
@@ -256,9 +258,7 @@ app.get('/tarjeta/:id', (req, res) => {
           z-index: 10;
           backdrop-filter: blur(4px);
         }
-        .carousel-btn:hover {
-          background: rgba(0, 0, 0, 0.8);
-        }
+        .carousel-btn:hover { background: rgba(0, 0, 0, 0.8); }
         .carousel-btn.prev { left: 10px; }
         .carousel-btn.next { right: 10px; }
         .carousel-indicators {
@@ -290,16 +290,8 @@ app.get('/tarjeta/:id', (req, res) => {
           background: rgba(0,0,0,0.3);
           border-radius: 16px;
         }
-        .info h2 {
-          font-size: 22px;
-          font-weight: 700;
-          color: #fbbf24;
-        }
-        .info p {
-          font-size: 15px;
-          color: #a0c4e8;
-          margin: 4px 0;
-        }
+        .info h2 { font-size: 22px; font-weight: 700; color: #fbbf24; }
+        .info p { font-size: 15px; color: #a0c4e8; margin: 4px 0; }
         .botones {
           display: flex;
           flex-wrap: wrap;
@@ -327,23 +319,9 @@ app.get('/tarjeta/:id', (req, res) => {
         .btn-wa { background: #25D366; color: #fff; }
         .btn-llamar { background: #1a4b6d; color: #fff; }
         .btn-compartir { background: #fbbf24; color: #0b1a2e; }
-        .qr {
-          text-align: center;
-          margin: 12px 0;
-        }
-        .qr img {
-          width: 100px;
-          height: 100px;
-          border-radius: 16px;
-          background: #fff;
-          padding: 8px;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        }
-        .qr p {
-          color: #a0c4e8;
-          font-size: 13px;
-          margin-top: 4px;
-        }
+        .qr { text-align: center; margin: 12px 0; }
+        .qr img { width: 100px; height: 100px; border-radius: 16px; background: #fff; padding: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+        .qr p { color: #a0c4e8; font-size: 13px; margin-top: 4px; }
         @media (max-width: 480px) {
           .container { padding: 16px; }
           .carousel-slides { height: 220px; }
@@ -352,12 +330,8 @@ app.get('/tarjeta/:id', (req, res) => {
           .botones a, .botones button { font-size: 13px; padding: 10px 14px; }
           .qr img { width: 80px; height: 80px; }
         }
-        @media (min-width: 768px) {
-          .carousel-slides { height: 420px; }
-        }
-        @media (min-width: 1024px) {
-          .carousel-slides { height: 480px; }
-        }
+        @media (min-width: 768px) { .carousel-slides { height: 420px; } }
+        @media (min-width: 1024px) { .carousel-slides { height: 480px; } }
       </style>
     </head>
     <body>
@@ -399,11 +373,8 @@ app.get('/tarjeta/:id', (req, res) => {
           currentIndex = index;
           slidesContainer.style.transform = 'translateX(-' + (currentIndex * 100) + '%)';
           indicators.forEach(function(ind, i) {
-            if (i === currentIndex) {
-              ind.classList.add('active');
-            } else {
-              ind.classList.remove('active');
-            }
+            if (i === currentIndex) ind.classList.add('active');
+            else ind.classList.remove('active');
           });
         }
 
@@ -416,20 +387,14 @@ app.get('/tarjeta/:id', (req, res) => {
           ind.addEventListener('click', function() { goToSlide(i); resetAutoPlay(); });
         });
 
-        function startAutoPlay() {
-          autoPlayInterval = setInterval(nextSlide, 5000);
-        }
-        function resetAutoPlay() {
-          clearInterval(autoPlayInterval);
-          startAutoPlay();
-        }
+        function startAutoPlay() { autoPlayInterval = setInterval(nextSlide, 5000); }
+        function resetAutoPlay() { clearInterval(autoPlayInterval); startAutoPlay(); }
 
         var carouselContainer = document.getElementById('carouselContainer');
         if (carouselContainer) {
           carouselContainer.addEventListener('mouseenter', function() { clearInterval(autoPlayInterval); });
           carouselContainer.addEventListener('mouseleave', function() { startAutoPlay(); });
         }
-
         if (totalSlides > 1) startAutoPlay();
 
         function compartir() {
