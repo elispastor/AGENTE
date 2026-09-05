@@ -888,7 +888,10 @@ app.get('/julio-vargas', (req, res) => {
 app.get('/', (req, res) => {
   res.redirect('/julio-vargas');
 });
-
+// Ruta para la tarjeta de Julio
+app.get('/julio-vargas', (req, res) => {
+  res.sendFile(__dirname + '/julio-vargas.html');
+});
 app.listen(PORT, () => {
   console.log('✅ Servidor TDI con PULPO 🐙 en puerto ' + PORT);
 });
