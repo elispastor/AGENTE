@@ -2,7 +2,6 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const { exec } = require('child_process');
 
 // =============================================
 // PERSISTENCIA DE DATOS CON ARCHIVO JSON
@@ -28,17 +27,6 @@ function guardarTarjetas(tarjetas) {
   } catch (error) {
     console.error('Error guardando tarjetas:', error);
   }
-}
-
-// Función para guardar en GitHub
-function guardarEnGitHub() {
-  exec('git add tarjetas.json && git commit -m "Actualizar tarjetas" && git push', (error, stdout, stderr) => {
-    if (error) {
-      console.error('Error al guardar en GitHub:', error);
-    } else {
-      console.log('✅ Tarjetas guardadas en GitHub');
-    }
-  });
 }
 
 const tarjetas = cargarTarjetas();
@@ -124,7 +112,7 @@ app.post('/chat', (req, res) => {
 });
 
 // =============================================
-// GENERAR TARJETA (CON PERSISTENCIA EN GITHUB)
+// GENERAR TARJETA (CON URL CORREGIDA)
 // =============================================
 app.post('/api/generar-tarjeta', upload.any(), (req, res) => {
   const { nombre, telefono, email } = req.body;
@@ -132,7 +120,7 @@ app.post('/api/generar-tarjeta', upload.any(), (req, res) => {
   const fotosCarrusel = req.files.filter(f => f.fieldname === 'fotosCarrusel');
 
   const id = Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
-  const enlace = `https://guia-digital.com/tarjeta/${id}`;
+  const enlace = `https://agente-1-w4vk.onrender.com/tarjeta/${id}`; // <--- URL CORREGIDA
 
   tarjetas[id] = {
     nombre,
@@ -145,10 +133,9 @@ app.post('/api/generar-tarjeta', upload.any(), (req, res) => {
   };
 
   guardarTarjetas(tarjetas);
-  guardarEnGitHub();
 
   res.json({
-    mensaje: '✅ Tarjeta generada y guardada en GitHub',
+    mensaje: '✅ Tarjeta generada',
     enlace,
     tarjeta: { nombre, telefono, email }
   });
@@ -509,8 +496,7 @@ app.get('/tarjeta/:id', (req, res) => {
 });
 
 // =============================================
-// =============================================
-// RUTA ESPECIAL PARA JULIO VARGAS (CON CARRUSEL DINÁMICO)
+// RUTA ESPECIAL PARA JULIO VARGAS
 // =============================================
 app.get('/julio-vargas', (req, res) => {
   const tarjeta = {
@@ -520,28 +506,14 @@ app.get('/julio-vargas', (req, res) => {
     enlace: 'https://guia-digital.com/julio-vargas'
   };
 
-  // ===== LEER TODAS LAS FOTOS DE LA CARPETA uploads/ =====
-  const uploadsDir = path.join(__dirname, 'uploads');
-  let fotos = [];
+  const fotos = [
+    '/uploads/julio-portada.jpg',
+    '/uploads/julio-foto1.jpg',
+    '/uploads/julio-foto2.jpg',
+    '/uploads/julio-foto3.jpg',
+    '/uploads/julio-foto4.jpg'
+  ];
 
-  try {
-    const files = fs.readdirSync(uploadsDir);
-    // Filtrar solo imágenes (jpg, jpeg, png, gif, webp, etc.)
-    fotos = files.filter(file => {
-      const ext = path.extname(file).toLowerCase();
-      return ['.jpg', '.jpeg', '.png', '.gif', '.webp'].includes(ext);
-    }).map(file => `/uploads/${file}`);
-  } catch (error) {
-    console.error('Error leyendo carpeta uploads:', error);
-    fotos = [];
-  }
-
-  // Si no hay fotos, mostrar un placeholder
-  if (fotos.length === 0) {
-    fotos = ['/uploads/placeholder.jpg'];
-  }
-
-  // Generar slides del carrusel
   let slidesHTML = '';
   let indicadoresHTML = '';
 
@@ -561,7 +533,6 @@ app.get('/julio-vargas', (req, res) => {
       <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
       <title>Julio Vargas - Tarjeta TDI</title>
       <style>
-        /* ===== RESET Y ESTILOS BÁSICOS ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
           background: linear-gradient(145deg, #0a1a2e, #1a2f44);
@@ -582,7 +553,6 @@ app.get('/julio-vargas', (req, res) => {
           border: 1px solid rgba(255,255,255,0.08);
           box-shadow: 0 30px 60px -12px rgba(0,0,0,0.7);
         }
-        /* ===== CARRUSEL ===== */
         .carousel-container {
           position: relative;
           width: 100%;
@@ -612,6 +582,12 @@ app.get('/julio-vargas', (req, res) => {
           height: 100%;
           object-fit: contain;
           background: #0b2b40;
+        }
+        .carousel-slides .slide .placeholder {
+          font-size: 48px;
+          color: #fbbf24;
+          text-align: center;
+          padding: 20px;
         }
         .carousel-btn {
           position: absolute;
@@ -656,7 +632,6 @@ app.get('/julio-vargas', (req, res) => {
           background: #fbbf24;
           transform: scale(1.2);
         }
-        /* ===== INFORMACIÓN ===== */
         .info {
           text-align: center;
           color: white;
@@ -667,7 +642,6 @@ app.get('/julio-vargas', (req, res) => {
         }
         .info h2 { font-size: 24px; font-weight: 700; color: #fbbf24; }
         .info p { font-size: 16px; color: #a0c4e8; margin: 4px 0; }
-        /* ===== BOTONES ===== */
         .botones {
           display: flex;
           flex-wrap: wrap;
@@ -695,11 +669,9 @@ app.get('/julio-vargas', (req, res) => {
         .btn-wa { background: #25D366; color: #fff; }
         .btn-llamar { background: #1a4b6d; color: #fff; }
         .btn-compartir { background: #fbbf24; color: #0b1a2e; }
-        /* ===== QR ===== */
         .qr { text-align: center; margin: 12px 0; }
         .qr img { width: 100px; height: 100px; border-radius: 16px; background: #fff; padding: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
         .qr p { color: #a0c4e8; font-size: 13px; margin-top: 4px; }
-        /* ===== MENÚ HAMBURGUESA ===== */
         .menu-toggle {
           position: fixed;
           top: 16px;
@@ -771,8 +743,7 @@ app.get('/julio-vargas', (req, res) => {
       </style>
     </head>
     <body>
-      <!-- MENÚ -->
-      <button class="menu-toggle" id="menuToggle">☰</button>
+      <button class="menu-toggle" id="menuToggle" aria-label="Menú">☰</button>
       <div class="menu-panel" id="menuPanel">
         <div class="menu-title">📇 TDI</div>
         <a href="https://guia-digital.com">🏠 Inicio</a>
@@ -783,8 +754,6 @@ app.get('/julio-vargas', (req, res) => {
         <a href="mailto:juliovargas1478@gmail.com">📧 Email</a>
         <a href="#" onclick="compartir()">🔗 Compartir</a>
       </div>
-
-      <!-- TARJETA -->
       <div class="container">
         <div class="carousel-container" id="carouselContainer">
           <div class="carousel-slides" id="carouselSlides">${slidesHTML}</div>
@@ -807,9 +776,7 @@ app.get('/julio-vargas', (req, res) => {
           <p>📲 Escanea para ver la tarjeta</p>
         </div>
       </div>
-
       <script>
-        // Control del carrusel
         const slidesContainer = document.getElementById('carouselSlides');
         const slides = slidesContainer.querySelectorAll('.slide');
         const indicators = document.querySelectorAll('.indicator');
@@ -824,57 +791,57 @@ app.get('/julio-vargas', (req, res) => {
           if (index >= totalSlides) index = 0;
           currentIndex = index;
           slidesContainer.style.transform = 'translateX(-' + (currentIndex * 100) + '%)';
-          indicators.forEach((ind, i) => {
-            ind.classList.toggle('active', i === currentIndex);
+          indicators.forEach(function(ind, i) {
+            if (i === currentIndex) ind.classList.add('active');
+            else ind.classList.remove('active');
           });
         }
 
         function nextSlide() { goToSlide(currentIndex + 1); }
         function prevSlide() { goToSlide(currentIndex - 1); }
 
-        nextBtn.addEventListener('click', () => { nextSlide(); resetAutoPlay(); });
-        prevBtn.addEventListener('click', () => { prevSlide(); resetAutoPlay(); });
-        indicators.forEach((ind, i) => {
-          ind.addEventListener('click', () => { goToSlide(i); resetAutoPlay(); });
+        if (nextBtn) nextBtn.addEventListener('click', function() { nextSlide(); resetAutoPlay(); });
+        if (prevBtn) prevBtn.addEventListener('click', function() { prevSlide(); resetAutoPlay(); });
+        indicators.forEach(function(ind, i) {
+          ind.addEventListener('click', function() { goToSlide(i); resetAutoPlay(); });
         });
 
-        function startAutoPlay() {
-          autoPlayInterval = setInterval(nextSlide, 5000);
-        }
-        function resetAutoPlay() {
-          clearInterval(autoPlayInterval);
-          startAutoPlay();
-        }
+        function startAutoPlay() { autoPlayInterval = setInterval(nextSlide, 5000); }
+        function resetAutoPlay() { clearInterval(autoPlayInterval); startAutoPlay(); }
 
-        const container = document.getElementById('carouselContainer');
-        container.addEventListener('mouseenter', () => clearInterval(autoPlayInterval));
-        container.addEventListener('mouseleave', startAutoPlay);
+        const carouselContainer = document.getElementById('carouselContainer');
+        if (carouselContainer) {
+          carouselContainer.addEventListener('mouseenter', function() { clearInterval(autoPlayInterval); });
+          carouselContainer.addEventListener('mouseleave', function() { startAutoPlay(); });
+        }
         if (totalSlides > 1) startAutoPlay();
 
-        // Menú hamburguesa
         const menuToggle = document.getElementById('menuToggle');
         const menuPanel = document.getElementById('menuPanel');
         let menuOpen = false;
-        menuToggle.addEventListener('click', () => {
+
+        menuToggle.addEventListener('click', function() {
           menuOpen = !menuOpen;
           menuPanel.classList.toggle('open', menuOpen);
           menuToggle.textContent = menuOpen ? '✕' : '☰';
         });
-        document.querySelectorAll('.menu-panel a').forEach(link => {
-          link.addEventListener('click', () => {
+
+        document.querySelectorAll('.menu-panel a').forEach(function(link) {
+          link.addEventListener('click', function() {
             menuPanel.classList.remove('open');
             menuToggle.textContent = '☰';
             menuOpen = false;
           });
         });
 
-        // Compartir
         function compartir() {
           const url = window.location.href;
           if (navigator.share) {
-            navigator.share({ title: 'Julio Vargas - Tarjeta TDI', url });
+            navigator.share({ title: 'Julio Vargas - Tarjeta TDI', url: url });
           } else {
-            navigator.clipboard.writeText(url).then(() => alert('📋 Enlace copiado. ¡Comparte tu tarjeta!'));
+            navigator.clipboard.writeText(url).then(function() {
+              alert('📋 Enlace copiado. ¡Comparte tu tarjeta!');
+            });
           }
         }
       </script>
@@ -882,16 +849,14 @@ app.get('/julio-vargas', (req, res) => {
     </html>
   `);
 });
+
 // =============================================
 // PÁGINA PRINCIPAL - REDIRIGE A JULIO VARGAS
 // =============================================
 app.get('/', (req, res) => {
   res.redirect('/julio-vargas');
 });
-// Ruta para la tarjeta de Julio
-app.get('/julio-vargas', (req, res) => {
-  res.sendFile(__dirname + '/julio-vargas.html');
-});
+
 app.listen(PORT, () => {
   console.log('✅ Servidor TDI con PULPO 🐙 en puerto ' + PORT);
 });
