@@ -108,15 +108,17 @@
       addMessage(message, 'user');
       input.value = '';
       try {
-  const response = await fetch('https://agente-1-w4vk.onrender.com/api/generar-tarjeta', {
-    method: 'POST',
-    body: formData
-  });
-  const resultado = await response.json();
-  // ...
-} catch (error) {
-  // ...
-}
+        const response = await fetch('https://agente-1-w4vk.onrender.com/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ mensaje: message })
+        });
+        const data = await response.json();
+        addMessage(data.respuesta || 'No pude procesar tu mensaje.', 'bot');
+      } catch (error) {
+        addMessage('❌ Error de conexión. Revisa tu internet.', 'bot');
+      }
+    }
 
     send.addEventListener('click', sendMessage);
     input.addEventListener('keypress', (e) => {
@@ -147,7 +149,7 @@
       }
 
       try {
-        const response = await fetch('/api/generar-tarjeta', {
+        const response = await fetch('https://agente-1-w4vk.onrender.com/api/generar-tarjeta', {
           method: 'POST',
           body: formData
         });
