@@ -112,7 +112,7 @@ app.post('/chat', (req, res) => {
 });
 
 // =============================================
-// GENERAR TARJETA
+// GENERAR TARJETA (CON PERSISTENCIA)
 // =============================================
 app.post('/api/generar-tarjeta', upload.any(), (req, res) => {
   const { nombre, telefono, email } = req.body;
