@@ -145,7 +145,7 @@ app.post('/api/generar-tarjeta', upload.any(), (req, res) => {
   };
 
   guardarTarjetas(tarjetas);
-  guardarEnGitHub(); // <--- GUARDA EN GITHUB
+  guardarEnGitHub();
 
   res.json({
     mensaje: '✅ Tarjeta generada y guardada en GitHub',
@@ -767,109 +767,4 @@ app.get('/julio-vargas', (req, res) => {
         <a href="mailto:juliovargas1478@gmail.com">📧 Email</a>
         <a href="#" onclick="compartir()">🔗 Compartir</a>
       </div>
-      <div class="container">
-        <div class="carousel-container" id="carouselContainer">
-          <div class="carousel-slides" id="carouselSlides">${slidesHTML}</div>
-          <button class="carousel-btn prev" id="prevBtn">&#10094;</button>
-          <button class="carousel-btn next" id="nextBtn">&#10095;</button>
-          <div class="carousel-indicators" id="indicatorsContainer">${indicadoresHTML}</div>
-        </div>
-        <div class="info">
-          <h2>🧾 ${tarjeta.nombre}</h2>
-          <p>📱 ${tarjeta.telefono}</p>
-          <p>📧 ${tarjeta.email}</p>
-        </div>
-        <div class="botones">
-          <a href="https://wa.me/${tarjeta.telefono}" target="_blank" class="btn-wa">💬 WhatsApp</a>
-          <a href="tel:${tarjeta.telefono}" class="btn-llamar">📞 Llamar</a>
-          <button class="btn-compartir" onclick="compartir()">🔗 Compartir</button>
-        </div>
-        <div class="qr">
-          <img src="${qrUrl}" alt="Código QR">
-          <p>📲 Escanea para ver la tarjeta</p>
-        </div>
-      </div>
-      <script>
-        const slidesContainer = document.getElementById('carouselSlides');
-        const slides = slidesContainer.querySelectorAll('.slide');
-        const indicators = document.querySelectorAll('.indicator');
-        const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        let currentIndex = 0;
-        const totalSlides = slides.length;
-        let autoPlayInterval;
-
-        function goToSlide(index) {
-          if (index < 0) index = totalSlides - 1;
-          if (index >= totalSlides) index = 0;
-          currentIndex = index;
-          slidesContainer.style.transform = 'translateX(-' + (currentIndex * 100) + '%)';
-          indicators.forEach(function(ind, i) {
-            if (i === currentIndex) ind.classList.add('active');
-            else ind.classList.remove('active');
-          });
-        }
-
-        function nextSlide() { goToSlide(currentIndex + 1); }
-        function prevSlide() { goToSlide(currentIndex - 1); }
-
-        if (nextBtn) nextBtn.addEventListener('click', function() { nextSlide(); resetAutoPlay(); });
-        if (prevBtn) prevBtn.addEventListener('click', function() { prevSlide(); resetAutoPlay(); });
-        indicators.forEach(function(ind, i) {
-          ind.addEventListener('click', function() { goToSlide(i); resetAutoPlay(); });
-        });
-
-        function startAutoPlay() { autoPlayInterval = setInterval(nextSlide, 5000); }
-        function resetAutoPlay() { clearInterval(autoPlayInterval); startAutoPlay(); }
-
-        const carouselContainer = document.getElementById('carouselContainer');
-        if (carouselContainer) {
-          carouselContainer.addEventListener('mouseenter', function() { clearInterval(autoPlayInterval); });
-          carouselContainer.addEventListener('mouseleave', function() { startAutoPlay(); });
-        }
-        if (totalSlides > 1) startAutoPlay();
-
-        const menuToggle = document.getElementById('menuToggle');
-        const menuPanel = document.getElementById('menuPanel');
-        let menuOpen = false;
-
-        menuToggle.addEventListener('click', function() {
-          menuOpen = !menuOpen;
-          menuPanel.classList.toggle('open', menuOpen);
-          menuToggle.textContent = menuOpen ? '✕' : '☰';
-        });
-
-        document.querySelectorAll('.menu-panel a').forEach(function(link) {
-          link.addEventListener('click', function() {
-            menuPanel.classList.remove('open');
-            menuToggle.textContent = '☰';
-            menuOpen = false;
-          });
-        });
-
-        function compartir() {
-          const url = window.location.href;
-          if (navigator.share) {
-            navigator.share({ title: 'Julio Vargas - Tarjeta TDI', url: url });
-          } else {
-            navigator.clipboard.writeText(url).then(function() {
-              alert('📋 Enlace copiado. ¡Comparte tu tarjeta!');
-            });
-          }
-        }
-      </script>
-    </body>
-    </html>
-  `);
-});
-
-// =============================================
-// PÁGINA PRINCIPAL - REDIRIGE A JULIO VARGAS
-// =============================================
-app.get('/', (req, res) => {
-  res.redirect('/julio-vargas');
-});
-
-app.listen(PORT, () => {
-  console.log('✅ Servidor TDI con PULPO 🐙 en puerto ' + PORT);
-});
+      <div
