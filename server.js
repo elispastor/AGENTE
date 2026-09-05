@@ -2,6 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const { exec } = require('child_process');
 
 // =============================================
 // PERSISTENCIA DE DATOS CON ARCHIVO JSON
@@ -27,6 +28,17 @@ function guardarTarjetas(tarjetas) {
   } catch (error) {
     console.error('Error guardando tarjetas:', error);
   }
+}
+
+// Función para guardar en GitHub
+function guardarEnGitHub() {
+  exec('git add tarjetas.json && git commit -m "Actualizar tarjetas" && git push', (error, stdout, stderr) => {
+    if (error) {
+      console.error('Error al guardar en GitHub:', error);
+    } else {
+      console.log('✅ Tarjetas guardadas en GitHub');
+    }
+  });
 }
 
 const tarjetas = cargarTarjetas();
@@ -112,7 +124,7 @@ app.post('/chat', (req, res) => {
 });
 
 // =============================================
-// GENERAR TARJETA (CON PERSISTENCIA)
+// GENERAR TARJETA (CON PERSISTENCIA EN GITHUB)
 // =============================================
 app.post('/api/generar-tarjeta', upload.any(), (req, res) => {
   const { nombre, telefono, email } = req.body;
@@ -133,9 +145,10 @@ app.post('/api/generar-tarjeta', upload.any(), (req, res) => {
   };
 
   guardarTarjetas(tarjetas);
+  guardarEnGitHub(); // <--- GUARDA EN GITHUB
 
   res.json({
-    mensaje: '✅ Tarjeta generada',
+    mensaje: '✅ Tarjeta generada y guardada en GitHub',
     enlace,
     tarjeta: { nombre, telefono, email }
   });
