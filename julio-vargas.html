@@ -11,13 +11,15 @@ app.get('/julio-vargas', (req, res) => {
   };
 
   // Fotos para el carrusel (puedes agregar más)
-  const fotos = [
-    '/uploads/julio-portada.jpg',  // Cambia por la imagen real
-    '/uploads/julio-foto1.jpg',
-    '/uploads/julio-foto2.jpg',
-    '/uploads/julio-foto3.jpg',
-    '/uploads/julio-foto4.jpg'
-  ];
+const fotos = [
+  'https://raw.githubusercontent.com/elispastor/AGENTE/main/uploads/Guía%20Digital%20Cucuta%20-%20Portada%20Banner.png',
+  'https://raw.githubusercontent.com/elispastor/AGENTE/main/uploads/Portada%20(2).jpg',
+  'https://raw.githubusercontent.com/elispastor/AGENTE/main/uploads/Portada%20(3).jpg',
+  'https://raw.githubusercontent.com/elispastor/AGENTE/main/uploads/Portada%20(4).jpg',
+  'https://raw.githubusercontent.com/elispastor/AGENTE/main/uploads/Portada%20(5).jpg',
+  'https://raw.githubusercontent.com/elispastor/AGENTE/main/uploads/portada.jpg',
+  'https://raw.githubusercontent.com/elispastor/AGENTE/main/uploads/portada-liga.png'
+];
 
   // Generar slides del carrusel
   let slidesHTML = '';
