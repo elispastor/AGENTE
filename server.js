@@ -1066,6 +1066,6 @@ app.get('/julio-vargas', (req, res) => {
   // ... (esta sí tiene formulario)
 });
 
-app.listen(PORT, () => {
-  console.log('✅ Servidor TDI con PULPO 🐙 en puerto ' + PORT);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`✅ Servidor TDI con PULPO 🐙 en puerto ${PORT}`);
 });
