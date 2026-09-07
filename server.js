@@ -1058,11 +1058,12 @@ app.get('/julio-vargas', (req, res) => {
   `);
 });
 
+
 // =============================================
-// PÁGINA PRINCIPAL - REDIRIGE A JULIO VARGAS
+// RUTA ESPECIAL PARA JULIO VARGAS (CON FORMULARIO)
 // =============================================
-app.get('/', (req, res) => {
-  res.redirect('/julio-vargas');
+app.get('/julio-vargas', (req, res) => {
+  // ... (esta sí tiene formulario)
 });
 
 app.listen(PORT, () => {
