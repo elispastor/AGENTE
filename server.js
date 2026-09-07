@@ -761,4 +761,29 @@ app.get('/julio-vargas', (req, res) => {
         .campo {
           margin-bottom: 12px;
         }
-        .campo
+        .campo label {
+          color: #a0c4e8;
+          font-size: 14px;
+          display: block;
+          margin-bottom: 4px;
+        }
+        .campo input, .campo select {
+          width: 100%;
+          padding: 12px 16px;
+          border-radius: 12px;
+          border: none;
+          background: rgba(255,255,255,0.06);
+          color: #fff;
+          font-size: 15px;
+          outline: none;
+          border: 1px solid rgba(255,255,255,0.06);
+        }
+        .campo input[type="file"] {
+          padding: 10px 0;
+          color: #94a3b8;
+          font-size: 14px;
+          background: rgba(255,255,255,0.04);
+          border: 1px dashed rgba(255,255,255,0.15);
+        }
+        .campo input::placeholder {
+          color: #6b8
