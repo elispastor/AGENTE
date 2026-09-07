@@ -495,9 +495,7 @@ app.get('/tarjeta/:id', (req, res) => {
   `);
 });
 
-// =============================================
-// RUTA ESPECIAL PARA JULIO VARGAS
-// =============================================
+
 // =============================================
 // RUTA ESPECIAL PARA JULIO VARGAS (CON FORMULARIO)
 // =============================================
@@ -937,42 +935,7 @@ app.get('/julio-vargas', (req, res) => {
           <p class="texto-informativo">Al enviar, los datos se enviarán directamente al WhatsApp de Julio para activar tu tarjeta.</p>
         </div>
       </div>
-// =============================================
-// ENVÍO A WHATSAPP
-// =============================================
-function enviarWhatsApp(event) {
-  event.preventDefault();
 
-  const nombre = document.getElementById('nombre').value.trim();
-  const telefono = document.getElementById('telefono').value.trim();
-  const email = document.getElementById('email').value.trim();
-  const negocio = document.getElementById('negocio').value.trim();
-  const plan = document.getElementById('plan').value;
-  const fotoPortada = document.getElementById('fotoPortada').files.length > 0 ? '✅ Sí' : '❌ No';
-  const fotosCarrusel = document.getElementById('fotosCarrusel').files.length > 0 ? '✅ Sí' : '❌ No';
-
-  if (!nombre || !telefono) {
-    alert('Por favor, completa al menos el nombre y el teléfono.');
-    return;
-  }
-
-  const mensaje = `📇 *NUEVO AFILIADO DESDE TARJETA DE JULIO*
-
-👤 *Nombre:* ${nombre}
-📱 *Teléfono:* ${telefono}
-📧 *Email:* ${email || 'No especificado'}
-🏢 *Negocio:* ${negocio || 'No especificado'}
-📋 *Plan elegido:* ${plan}
-🖼️ *Foto de portada:* ${fotoPortada}
-🎠 *Fotos para carrusel:* ${fotosCarrusel}
-
-🔗 *Viene desde:* ${window.location.href}`;
-
-  const mensajeCodificado = encodeURIComponent(mensaje);
-  const numeroJulio = '573244913371';
-
-  window.open(`https://wa.me/${numeroJulio}?text=${mensajeCodificado}`, '_blank');
-}
       <script>
         // =============================================
         // CARRUSEL
@@ -1072,15 +1035,15 @@ function enviarWhatsApp(event) {
 
           const mensaje = `📇 *NUEVO AFILIADO DESDE TARJETA DE JULIO*
 
-        👤 *Nombre:* ${nombre}
-        📱 *Teléfono:* ${telefono}
-        📧 *Email:* ${email || 'No especificado'}
-        🏢 *Negocio:* ${negocio || 'No especificado'}
-        📋 *Plan elegido:* ${plan}
-        🖼️ *Foto de portada:* ${fotoPortada}
-        🎠 *Fotos para carrusel:* ${fotosCarrusel}
+          👤 *Nombre:* ${nombre}
+          📱 *Teléfono:* ${telefono}
+          📧 *Email:* ${email || 'No especificado'}
+          🏢 *Negocio:* ${negocio || 'No especificado'}
+          📋 *Plan elegido:* ${plan}
+          🖼️ *Foto de portada:* ${fotoPortada}
+          🎠 *Fotos para carrusel:* ${fotosCarrusel}
 
-        🔗 *Viene desde:* ${window.location.href}`;
+          🔗 *Viene desde:* ${window.location.href}`;
 
           const mensajeCodificado = encodeURIComponent(mensaje);
           const numeroJulio = '573244913371';
@@ -1092,7 +1055,6 @@ function enviarWhatsApp(event) {
     </html>
   `);
 });
-
 
 // =============================================
 // RUTA ESPECIAL PARA JULIO VARGAS (CON FORMULARIO)
