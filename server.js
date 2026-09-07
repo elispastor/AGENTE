@@ -58,8 +58,6 @@ app.use((req, res, next) => {
   next();
 });
 
-const conversaciones = {};
-
 // =============================================
 // RUTAS DE PRUEBA
 // =============================================
@@ -67,11 +65,7 @@ app.get('/api/status', (req, res) => {
   res.json({
     status: 'online',
     service: 'TDI - Tarjeta Digital Inteligente',
-    version: '2.1.0',
-    endpoints: {
-      chat: '/chat',
-      generarTarjeta: '/api/generar-tarjeta'
-    }
+    version: '2.1.0'
   });
 });
 
@@ -84,35 +78,24 @@ app.get('/test', (req, res) => {
 // =============================================
 app.post('/chat', (req, res) => {
   const { mensaje } = req.body;
-
-  if (!mensaje) {
-    return res.status(400).json({ error: 'Mensaje requerido' });
-  }
+  if (!mensaje) return res.status(400).json({ error: 'Mensaje requerido' });
 
   let respuesta = '';
   const msg = mensaje.toLowerCase();
 
   if (msg.includes('hola') || msg.includes('buenas')) {
-    respuesta = '🐙 ¡Hola! Soy PULPO, tu agente del TDI. ¿Cómo puedo ayudarte a hacer crecer tu negocio hoy?';
-  } else if (msg.includes('tdi') || msg.includes('que significa tdi') || msg.includes('qué es tdi')) {
-    respuesta = '🧠 TDI significa **Tarjeta Digital Inteligente**. Es un ecosistema digital que permite a cualquier negocio tener presencia en línea con una tarjeta digital, visibilidad en la Guía Digital de Cúcuta y la posibilidad de generar ingresos pasivos a través de referidos. ¿Quieres saber más sobre los planes?';
-  } else if (msg.includes('tarjeta') || msg.includes('digital')) {
-    respuesta = '📇 ¡Excelente! Nuestra tarjeta digital incluye QR, botones de acción y un carrusel de fotos. ¿Quieres saber más sobre los planes?';
-  } else if (msg.includes('plan') || msg.includes('precio') || msg.includes('costo')) {
-    respuesta = '💰 Tenemos 4 planes:\n• Básico: $25.000/año\n• Intermedio: $50.000/año\n• Avanzado: $100.000/año\n• Premium: $200.000/año (incluye agente de IA)\n¿Cuál te interesa?';
-  } else if (msg.includes('guía') || msg.includes('cúcuta')) {
-    respuesta = '📍 La Guía Digital de Cúcuta es el directorio donde todos los negocios de la ciudad ya están. ¡Aparece ahí y haz que te encuentren!';
-  } else if (msg.includes('agente') || msg.includes('pulpo')) {
-    respuesta = '🐙 PULPO es tu agente de IA, entrenado para atender a tus clientes 24/7. Con el plan Premium, tus clientes tendrán atención instantánea.';
+    respuesta = '🐙 ¡Hola! Soy PULPO. ¿Cómo puedo ayudarte?';
+  } else if (msg.includes('plan') || msg.includes('precio')) {
+    respuesta = '💰 Planes: Básico $25k, Intermedio $50k, Avanzado $100k, Premium $200k';
   } else {
-    respuesta = '🐙 Gracias por tu mensaje. Te recomiendo visitar nuestra guía digital o preguntarme sobre tarjetas, planes o la guía de Cúcuta. ¿En qué más puedo ayudarte?';
+    respuesta = '🐙 Pregúntame sobre tarjetas, planes o la guía de Cúcuta.';
   }
 
   res.json({ respuesta });
 });
 
 // =============================================
-// GENERAR TARJETA (CON URL CORREGIDA)
+// GENERAR TARJETA
 // =============================================
 app.post('/api/generar-tarjeta', upload.any(), (req, res) => {
   const { nombre, telefono, email } = req.body;
@@ -133,16 +116,11 @@ app.post('/api/generar-tarjeta', upload.any(), (req, res) => {
   };
 
   guardarTarjetas(tarjetas);
-
-  res.json({
-    mensaje: '✅ Tarjeta generada',
-    enlace,
-    tarjeta: { nombre, telefono, email }
-  });
+  res.json({ mensaje: '✅ Tarjeta generada', enlace });
 });
 
 // =============================================
-// RUTA PARA VER TARJETAS GUARDADAS
+// VER TARJETA POR ID
 // =============================================
 app.get('/tarjeta/:id', (req, res) => {
   const tarjeta = tarjetas[req.params.id];
@@ -150,7 +128,7 @@ app.get('/tarjeta/:id', (req, res) => {
 
   const fotos = [];
   if (tarjeta.fotoPortada) fotos.push(`/uploads/${tarjeta.fotoPortada}`);
-  if (tarjeta.fotosCarrusel && tarjeta.fotosCarrusel.length > 0) {
+  if (tarjeta.fotosCarrusel) {
     tarjeta.fotosCarrusel.forEach(f => fotos.push(`/uploads/${f}`));
   }
 
@@ -158,8 +136,8 @@ app.get('/tarjeta/:id', (req, res) => {
   let indicadoresHTML = '';
 
   if (fotos.length === 0) {
-    slidesHTML = `<div class="slide"><div class="placeholder">📸 Sube tus fotos</div></div>`;
-    indicadoresHTML = `<span class="indicator active"></span>`;
+    slidesHTML = '<div class="slide"><div class="placeholder">📸 Sube tus fotos</div></div>';
+    indicadoresHTML = '<span class="indicator active"></span>';
   } else {
     fotos.forEach((url, index) => {
       const isActive = index === 0 ? 'active' : '';
@@ -175,7 +153,7 @@ app.get('/tarjeta/:id', (req, res) => {
     <html>
     <head>
       <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>Tarjeta TDI - ${tarjeta.nombre}</title>
       <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -186,7 +164,7 @@ app.get('/tarjeta/:id', (req, res) => {
           justify-content: center;
           align-items: center;
           padding: 16px;
-          font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+          font-family: 'Segoe UI', Roboto, sans-serif;
         }
         .container {
           max-width: 520px;
@@ -196,49 +174,41 @@ app.get('/tarjeta/:id', (req, res) => {
           border-radius: 32px;
           padding: 24px 20px;
           border: 1px solid rgba(255,255,255,0.08);
-          box-shadow: 0 30px 60px -12px rgba(0,0,0,0.7);
         }
         .carousel-container {
           position: relative;
           width: 100%;
-          max-width: 600px;
-          margin: 0 auto;
           overflow: hidden;
           border-radius: 16px;
           background: #0b2b40;
-          box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
         }
         .carousel-slides {
           display: flex;
-          transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+          transition: transform 0.6s;
           height: 350px;
         }
-        .carousel-slides .slide {
+        .slide {
           min-width: 100%;
           height: 100%;
           display: flex;
           align-items: center;
           justify-content: center;
           background: #0b2b40;
-          position: relative;
         }
-        .carousel-slides .slide img {
+        .slide img {
           width: 100%;
           height: 100%;
           object-fit: contain;
-          background: #0b2b40;
         }
-        .carousel-slides .slide .placeholder {
+        .slide .placeholder {
           font-size: 48px;
           color: #fbbf24;
-          text-align: center;
-          padding: 20px;
         }
         .carousel-btn {
           position: absolute;
           top: 50%;
           transform: translateY(-50%);
-          background: rgba(0, 0, 0, 0.5);
+          background: rgba(0,0,0,0.5);
           color: white;
           border: none;
           width: 40px;
@@ -246,14 +216,8 @@ app.get('/tarjeta/:id', (req, res) => {
           border-radius: 50%;
           cursor: pointer;
           font-size: 20px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          transition: background 0.3s ease;
           z-index: 10;
-          backdrop-filter: blur(4px);
         }
-        .carousel-btn:hover { background: rgba(0, 0, 0, 0.8); }
         .carousel-btn.prev { left: 10px; }
         .carousel-btn.next { right: 10px; }
         .carousel-indicators {
@@ -265,15 +229,14 @@ app.get('/tarjeta/:id', (req, res) => {
           gap: 8px;
           z-index: 10;
         }
-        .carousel-indicators .indicator {
+        .indicator {
           width: 10px;
           height: 10px;
           border-radius: 50%;
-          background: rgba(255, 255, 255, 0.3);
+          background: rgba(255,255,255,0.3);
           cursor: pointer;
-          transition: background 0.3s ease, transform 0.3s ease;
         }
-        .carousel-indicators .indicator.active {
+        .indicator.active {
           background: #fbbf24;
           transform: scale(1.2);
         }
@@ -285,7 +248,7 @@ app.get('/tarjeta/:id', (req, res) => {
           background: rgba(0,0,0,0.3);
           border-radius: 16px;
         }
-        .info h2 { font-size: 24px; font-weight: 700; color: #fbbf24; }
+        .info h2 { font-size: 24px; color: #fbbf24; }
         .info p { font-size: 16px; color: #a0c4e8; margin: 4px 0; }
         .botones {
           display: flex;
@@ -295,9 +258,6 @@ app.get('/tarjeta/:id', (req, res) => {
           margin: 16px 0;
         }
         .botones a, .botones button {
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
           padding: 12px 20px;
           border-radius: 60px;
           font-weight: 700;
@@ -305,102 +265,25 @@ app.get('/tarjeta/:id', (req, res) => {
           border: none;
           text-decoration: none;
           cursor: pointer;
-          transition: 0.2s;
           box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-          flex: 1 0 auto;
-          justify-content: center;
         }
-        .botones a:hover, .botones button:hover { transform: scale(1.04); }
         .btn-wa { background: #25D366; color: #fff; }
         .btn-llamar { background: #1a4b6d; color: #fff; }
         .btn-compartir { background: #fbbf24; color: #0b1a2e; }
         .qr { text-align: center; margin: 12px 0; }
-        .qr img { width: 100px; height: 100px; border-radius: 16px; background: #fff; padding: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+        .qr img {
+          width: 100px;
+          height: 100px;
+          border-radius: 16px;
+          background: #fff;
+          padding: 8px;
+        }
         .qr p { color: #a0c4e8; font-size: 13px; margin-top: 4px; }
-        .menu-toggle {
-          position: fixed;
-          top: 16px;
-          right: 16px;
-          background: rgba(0,0,0,0.7);
-          color: white;
-          border: none;
-          width: 50px;
-          height: 50px;
-          border-radius: 50%;
-          font-size: 24px;
-          cursor: pointer;
-          z-index: 100;
-          backdrop-filter: blur(4px);
-          transition: 0.3s;
-        }
-        .menu-toggle:hover { background: #fbbf24; color: #0b1a2e; }
-        .menu-panel {
-          position: fixed;
-          top: 0;
-          right: -300px;
-          width: 280px;
-          height: 100%;
-          background: rgba(10, 26, 46, 0.95);
-          backdrop-filter: blur(12px);
-          padding: 80px 20px 20px;
-          transition: right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-          z-index: 99;
-          box-shadow: -4px 0 30px rgba(0,0,0,0.5);
-          border-left: 1px solid rgba(255,255,255,0.05);
-        }
-        .menu-panel.open { right: 0; }
-        .menu-panel a {
-          display: block;
-          color: #a0c4e8;
-          text-decoration: none;
-          font-size: 18px;
-          font-weight: 600;
-          padding: 14px 20px;
-          border-radius: 12px;
-          transition: 0.2s;
-          border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-        .menu-panel a:hover {
-          background: rgba(251, 191, 36, 0.1);
-          color: #fbbf24;
-          padding-left: 28px;
-        }
-        .menu-panel .menu-title {
-          color: #fbbf24;
-          font-size: 20px;
-          font-weight: 700;
-          padding: 14px 20px 30px;
-          text-align: center;
-          border-bottom: 2px solid rgba(251, 191, 36, 0.2);
-          margin-bottom: 10px;
-        }
-        @media (max-width: 480px) {
-          .container { padding: 16px; }
-          .carousel-slides { height: 220px; }
-          .carousel-btn { width: 32px; height: 32px; font-size: 16px; }
-          .info h2 { font-size: 20px; }
-          .botones a, .botones button { font-size: 13px; padding: 10px 14px; }
-          .qr img { width: 80px; height: 80px; }
-          .menu-panel { width: 240px; }
-        }
-        @media (min-width: 768px) { .carousel-slides { height: 420px; } }
-        @media (min-width: 1024px) { .carousel-slides { height: 480px; } }
       </style>
     </head>
     <body>
-      <button class="menu-toggle" id="menuToggle" aria-label="Menú">☰</button>
-      <div class="menu-panel" id="menuPanel">
-        <div class="menu-title">📇 TDI</div>
-        <a href="https://guia-digital.com">🏠 Inicio</a>
-        <a href="https://guia-digital.com/tarjetas">📇 Mis Tarjetas</a>
-        <a href="https://guia-digital.com/planes">📊 Planes</a>
-        <a href="https://guia-digital.com/contacto">📩 Contacto</a>
-        <a href="https://wa.me/${tarjeta.telefono}" target="_blank">💬 WhatsApp</a>
-        <a href="mailto:${tarjeta.email}">📧 Email</a>
-        <a href="#" onclick="compartir()">🔗 Compartir</a>
-      </div>
       <div class="container">
-        <div class="carousel-container" id="carouselContainer">
+        <div class="carousel-container">
           <div class="carousel-slides" id="carouselSlides">${slidesHTML}</div>
           <button class="carousel-btn prev" id="prevBtn">&#10094;</button>
           <button class="carousel-btn next" id="nextBtn">&#10095;</button>
@@ -409,7 +292,7 @@ app.get('/tarjeta/:id', (req, res) => {
         <div class="info">
           <h2>🧾 ${tarjeta.nombre}</h2>
           <p>📱 ${tarjeta.telefono}</p>
-          <p>📧 ${tarjeta.email}</p>
+          <p>📧 ${tarjeta.email || 'No especificado'}</p>
         </div>
         <div class="botones">
           <a href="https://wa.me/${tarjeta.telefono}" target="_blank" class="btn-wa">💬 WhatsApp</a>
@@ -436,57 +319,39 @@ app.get('/tarjeta/:id', (req, res) => {
           if (index >= totalSlides) index = 0;
           currentIndex = index;
           slidesContainer.style.transform = 'translateX(-' + (currentIndex * 100) + '%)';
-          indicators.forEach(function(ind, i) {
-            if (i === currentIndex) ind.classList.add('active');
-            else ind.classList.remove('active');
+          indicators.forEach((ind, i) => {
+            ind.classList.toggle('active', i === currentIndex);
           });
         }
 
         function nextSlide() { goToSlide(currentIndex + 1); }
         function prevSlide() { goToSlide(currentIndex - 1); }
 
-        if (nextBtn) nextBtn.addEventListener('click', function() { nextSlide(); resetAutoPlay(); });
-        if (prevBtn) prevBtn.addEventListener('click', function() { prevSlide(); resetAutoPlay(); });
-        indicators.forEach(function(ind, i) {
-          ind.addEventListener('click', function() { goToSlide(i); resetAutoPlay(); });
+        if (nextBtn) nextBtn.addEventListener('click', () => { nextSlide(); resetAutoPlay(); });
+        if (prevBtn) prevBtn.addEventListener('click', () => { prevSlide(); resetAutoPlay(); });
+        indicators.forEach(ind => {
+          ind.addEventListener('click', () => {
+            goToSlide(parseInt(ind.dataset.index));
+            resetAutoPlay();
+          });
         });
 
         function startAutoPlay() { autoPlayInterval = setInterval(nextSlide, 5000); }
         function resetAutoPlay() { clearInterval(autoPlayInterval); startAutoPlay(); }
 
-        const carouselContainer = document.getElementById('carouselContainer');
+        const carouselContainer = document.getElementById('carousel-container') || document.querySelector('.carousel-container');
         if (carouselContainer) {
-          carouselContainer.addEventListener('mouseenter', function() { clearInterval(autoPlayInterval); });
-          carouselContainer.addEventListener('mouseleave', function() { startAutoPlay(); });
+          carouselContainer.addEventListener('mouseenter', () => clearInterval(autoPlayInterval));
+          carouselContainer.addEventListener('mouseleave', startAutoPlay);
         }
         if (totalSlides > 1) startAutoPlay();
-
-        const menuToggle = document.getElementById('menuToggle');
-        const menuPanel = document.getElementById('menuPanel');
-        let menuOpen = false;
-
-        menuToggle.addEventListener('click', function() {
-          menuOpen = !menuOpen;
-          menuPanel.classList.toggle('open', menuOpen);
-          menuToggle.textContent = menuOpen ? '✕' : '☰';
-        });
-
-        document.querySelectorAll('.menu-panel a').forEach(function(link) {
-          link.addEventListener('click', function() {
-            menuPanel.classList.remove('open');
-            menuToggle.textContent = '☰';
-            menuOpen = false;
-          });
-        });
 
         function compartir() {
           const url = window.location.href;
           if (navigator.share) {
-            navigator.share({ title: 'Julio Vargas - Tarjeta TDI', url: url });
+            navigator.share({ title: 'Tarjeta TDI', url: url });
           } else {
-            navigator.clipboard.writeText(url).then(function() {
-              alert('📋 Enlace copiado. ¡Comparte tu tarjeta!');
-            });
+            navigator.clipboard.writeText(url).then(() => alert('📋 Enlace copiado'));
           }
         }
       </script>
@@ -496,7 +361,7 @@ app.get('/tarjeta/:id', (req, res) => {
 });
 
 // =============================================
-// RUTA ESPECIAL PARA JULIO VARGAS (CON FORMULARIO)
+// RUTA JULIO VARGAS (COMPLETA)
 // =============================================
 app.get('/julio-vargas', (req, res) => {
   const tarjeta = {
@@ -509,15 +374,7 @@ app.get('/julio-vargas', (req, res) => {
   const fotos = [
     'https://raw.githubusercontent.com/elispastor/AGENTE/main/images/portada-julio.jpg',
     'https://raw.githubusercontent.com/elispastor/AGENTE/main/images/A1.jpg',
-    'https://raw.githubusercontent.com/elispastor/AGENTE/main/images/A2.jpg',
-    'https://raw.githubusercontent.com/elispastor/AGENTE/main/images/A3.png',
-    'https://raw.githubusercontent.com/elispastor/AGENTE/main/images/A4.jpg',
-    'https://raw.githubusercontent.com/elispastor/AGENTE/main/images/A5.jpg',
-    'https://raw.githubusercontent.com/elispastor/AGENTE/main/images/A6.jpg',
-    'https://raw.githubusercontent.com/elispastor/AGENTE/main/images/A7.jpg',
-    'https://raw.githubusercontent.com/elispastor/AGENTE/main/images/A8.png',
-    'https://raw.githubusercontent.com/elispastor/AGENTE/main/images/A9.jpg',
-    'https://raw.githubusercontent.com/elispastor/AGENTE/main/images/A10.jpg'
+    'https://raw.githubusercontent.com/elispastor/AGENTE/main/images/A2.jpg'
   ];
 
   let slidesHTML = '';
@@ -536,7 +393,7 @@ app.get('/julio-vargas', (req, res) => {
     <html>
     <head>
       <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>Julio Vargas - Tarjeta TDI</title>
       <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -547,7 +404,7 @@ app.get('/julio-vargas', (req, res) => {
           justify-content: center;
           align-items: center;
           padding: 16px;
-          font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+          font-family: 'Segoe UI', Roboto, sans-serif;
         }
         .container {
           max-width: 520px;
@@ -557,49 +414,37 @@ app.get('/julio-vargas', (req, res) => {
           border-radius: 32px;
           padding: 24px 20px;
           border: 1px solid rgba(255,255,255,0.08);
-          box-shadow: 0 30px 60px -12px rgba(0,0,0,0.7);
         }
         .carousel-container {
           position: relative;
           width: 100%;
-          max-width: 600px;
-          margin: 0 auto;
           overflow: hidden;
           border-radius: 16px;
           background: #0b2b40;
-          box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
         }
         .carousel-slides {
           display: flex;
-          transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+          transition: transform 0.6s;
           height: 350px;
         }
-        .carousel-slides .slide {
+        .slide {
           min-width: 100%;
           height: 100%;
           display: flex;
           align-items: center;
           justify-content: center;
           background: #0b2b40;
-          position: relative;
         }
-        .carousel-slides .slide img {
+        .slide img {
           width: 100%;
           height: 100%;
           object-fit: contain;
-          background: #0b2b40;
-        }
-        .carousel-slides .slide .placeholder {
-          font-size: 48px;
-          color: #fbbf24;
-          text-align: center;
-          padding: 20px;
         }
         .carousel-btn {
           position: absolute;
           top: 50%;
           transform: translateY(-50%);
-          background: rgba(0, 0, 0, 0.5);
+          background: rgba(0,0,0,0.5);
           color: white;
           border: none;
           width: 40px;
@@ -607,14 +452,8 @@ app.get('/julio-vargas', (req, res) => {
           border-radius: 50%;
           cursor: pointer;
           font-size: 20px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          transition: background 0.3s ease;
           z-index: 10;
-          backdrop-filter: blur(4px);
         }
-        .carousel-btn:hover { background: rgba(0, 0, 0, 0.8); }
         .carousel-btn.prev { left: 10px; }
         .carousel-btn.next { right: 10px; }
         .carousel-indicators {
@@ -626,15 +465,14 @@ app.get('/julio-vargas', (req, res) => {
           gap: 8px;
           z-index: 10;
         }
-        .carousel-indicators .indicator {
+        .indicator {
           width: 10px;
           height: 10px;
           border-radius: 50%;
-          background: rgba(255, 255, 255, 0.3);
+          background: rgba(255,255,255,0.3);
           cursor: pointer;
-          transition: background 0.3s ease, transform 0.3s ease;
         }
-        .carousel-indicators .indicator.active {
+        .indicator.active {
           background: #fbbf24;
           transform: scale(1.2);
         }
@@ -646,7 +484,7 @@ app.get('/julio-vargas', (req, res) => {
           background: rgba(0,0,0,0.3);
           border-radius: 16px;
         }
-        .info h2 { font-size: 24px; font-weight: 700; color: #fbbf24; }
+        .info h2 { font-size: 24px; color: #fbbf24; }
         .info p { font-size: 16px; color: #a0c4e8; margin: 4px 0; }
         .botones {
           display: flex;
@@ -656,9 +494,6 @@ app.get('/julio-vargas', (req, res) => {
           margin: 16px 0;
         }
         .botones a, .botones button {
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
           padding: 12px 20px;
           border-radius: 60px;
           font-weight: 700;
@@ -666,97 +501,32 @@ app.get('/julio-vargas', (req, res) => {
           border: none;
           text-decoration: none;
           cursor: pointer;
-          transition: 0.2s;
           box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-          flex: 1 0 auto;
-          justify-content: center;
         }
-        .botones a:hover, .botones button:hover { transform: scale(1.04); }
         .btn-wa { background: #25D366; color: #fff; }
         .btn-llamar { background: #1a4b6d; color: #fff; }
         .btn-compartir { background: #fbbf24; color: #0b1a2e; }
         .qr { text-align: center; margin: 12px 0; }
-        .qr img { width: 100px; height: 100px; border-radius: 16px; background: #fff; padding: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+        .qr img {
+          width: 100px;
+          height: 100px;
+          border-radius: 16px;
+          background: #fff;
+          padding: 8px;
+        }
         .qr p { color: #a0c4e8; font-size: 13px; margin-top: 4px; }
-        .menu-toggle {
-          position: fixed;
-          top: 16px;
-          right: 16px;
-          background: rgba(0,0,0,0.7);
-          color: white;
-          border: none;
-          width: 50px;
-          height: 50px;
-          border-radius: 50%;
-          font-size: 24px;
-          cursor: pointer;
-          z-index: 100;
-          backdrop-filter: blur(4px);
-          transition: 0.3s;
-        }
-        .menu-toggle:hover { background: #fbbf24; color: #0b1a2e; }
-        .menu-panel {
-          position: fixed;
-          top: 0;
-          right: -300px;
-          width: 280px;
-          height: 100%;
-          background: rgba(10, 26, 46, 0.95);
-          backdrop-filter: blur(12px);
-          padding: 80px 20px 20px;
-          transition: right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-          z-index: 99;
-          box-shadow: -4px 0 30px rgba(0,0,0,0.5);
-          border-left: 1px solid rgba(255,255,255,0.05);
-        }
-        .menu-panel.open { right: 0; }
-        .menu-panel a {
-          display: block;
-          color: #a0c4e8;
-          text-decoration: none;
-          font-size: 18px;
-          font-weight: 600;
-          padding: 14px 20px;
-          border-radius: 12px;
-          transition: 0.2s;
-          border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-        .menu-panel a:hover {
-          background: rgba(251, 191, 36, 0.1);
-          color: #fbbf24;
-          padding-left: 28px;
-        }
-        .menu-panel .menu-title {
-          color: #fbbf24;
-          font-size: 20px;
-          font-weight: 700;
-          padding: 14px 20px 30px;
-          text-align: center;
-          border-bottom: 2px solid rgba(251, 191, 36, 0.2);
-          margin-bottom: 10px;
-        }
-        /* ESTILOS DEL FORMULARIO */
         .formulario-section {
           background: rgba(255,255,255,0.05);
-          backdrop-filter: blur(8px);
           border-radius: 24px;
           padding: 24px 20px;
           margin-top: 24px;
           border: 1px solid rgba(255,255,255,0.1);
-          box-shadow: 0 8px 24px rgba(0,0,0,0.3);
         }
         .formulario-section h3 {
           color: #fbbf24;
           font-size: 20px;
-          font-weight: 700;
           text-align: center;
           margin-bottom: 16px;
-        }
-        .formulario-section p.descripcion {
-          color: #a0c4e8;
-          text-align: center;
-          font-size: 14px;
-          margin-bottom: 20px;
         }
         .campo {
           margin-bottom: 12px;
@@ -776,17 +546,6 @@ app.get('/julio-vargas', (req, res) => {
           color: #fff;
           font-size: 15px;
           outline: none;
-          border: 1px solid rgba(255,255,255,0.06);
-        }
-        .campo input[type="file"] {
-          padding: 10px 0;
-          color: #94a3b8;
-          font-size: 14px;
-          background: rgba(255,255,255,0.04);
-          border: 1px dashed rgba(255,255,255,0.15);
-        }
-        .campo input::placeholder {
-          color: #6b8fa0;
         }
         .btn-enviar-wa {
           width: 100%;
@@ -794,4 +553,155 @@ app.get('/julio-vargas', (req, res) => {
           border: none;
           border-radius: 40px;
           background: linear-gradient(135deg, #25D366, #128C7E);
-         
+          color: #fff;
+          font-weight: 700;
+          font-size: 16px;
+          cursor: pointer;
+          margin-top: 12px;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="carousel-container">
+          <div class="carousel-slides" id="carouselSlides">${slidesHTML}</div>
+          <button class="carousel-btn prev" id="prevBtn">&#10094;</button>
+          <button class="carousel-btn next" id="nextBtn">&#10095;</button>
+          <div class="carousel-indicators" id="indicatorsContainer">${indicadoresHTML}</div>
+        </div>
+        <div class="info">
+          <h2>🧾 ${tarjeta.nombre}</h2>
+          <p>📱 ${tarjeta.telefono}</p>
+          <p>📧 ${tarjeta.email}</p>
+        </div>
+        <div class="botones">
+          <a href="https://wa.me/${tarjeta.telefono}" target="_blank" class="btn-wa">💬 WhatsApp</a>
+          <a href="tel:${tarjeta.telefono}" class="btn-llamar">📞 Llamar</a>
+          <button class="btn-compartir" onclick="compartir()">🔗 Compartir</button>
+        </div>
+        <div class="qr">
+          <img src="${qrUrl}" alt="Código QR">
+          <p>📲 Escanea para ver la tarjeta</p>
+        </div>
+        <div class="formulario-section">
+          <h3>📇 Obtén tu Tarjeta TDI</h3>
+          <form id="formAfiliado" onsubmit="enviarWhatsApp(event)">
+            <div class="campo">
+              <label>Nombre completo</label>
+              <input type="text" id="nombre" placeholder="Ej: Julio Vargas" required>
+            </div>
+            <div class="campo">
+              <label>Teléfono WhatsApp</label>
+              <input type="tel" id="telefono" placeholder="Ej: 573001234567" required>
+            </div>
+            <div class="campo">
+              <label>Correo electrónico</label>
+              <input type="email" id="email" placeholder="Ej: contacto@negocio.com">
+            </div>
+            <div class="campo">
+              <label>Nombre de tu negocio</label>
+              <input type="text" id="negocio" placeholder="Ej: Taller El Tigre">
+            </div>
+            <div class="campo">
+              <label>Plan de interés</label>
+              <select id="plan">
+                <option value="Básico ($25.000/año)">Básico ($25.000/año)</option>
+                <option value="Intermedio ($50.000/año)" selected>Intermedio ($50.000/año)</option>
+                <option value="Avanzado ($100.000/año)">Avanzado ($100.000/año)</option>
+                <option value="Premium ($200.000/año)">Premium ($200.000/año)</option>
+              </select>
+            </div>
+            <button type="submit" class="btn-enviar-wa">💬 Enviar datos por WhatsApp</button>
+          </form>
+        </div>
+      </div>
+      <script>
+        const slidesContainer = document.getElementById('carouselSlides');
+        const slides = slidesContainer.querySelectorAll('.slide');
+        const indicators = document.querySelectorAll('.indicator');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        let currentIndex = 0;
+        const totalSlides = slides.length;
+        let autoPlayInterval;
+
+        function goToSlide(index) {
+          if (index < 0) index = totalSlides - 1;
+          if (index >= totalSlides) index = 0;
+          currentIndex = index;
+          slidesContainer.style.transform = 'translateX(-' + (currentIndex * 100) + '%)';
+          indicators.forEach((ind, i) => {
+            ind.classList.toggle('active', i === currentIndex);
+          });
+        }
+
+        function nextSlide() { goToSlide(currentIndex + 1); }
+        function prevSlide() { goToSlide(currentIndex - 1); }
+
+        if (nextBtn) nextBtn.addEventListener('click', () => { nextSlide(); resetAutoPlay(); });
+        if (prevBtn) prevBtn.addEventListener('click', () => { prevSlide(); resetAutoPlay(); });
+        indicators.forEach(ind => {
+          ind.addEventListener('click', () => {
+            goToSlide(parseInt(ind.dataset.index));
+            resetAutoPlay();
+          });
+        });
+
+        function startAutoPlay() { autoPlayInterval = setInterval(nextSlide, 5000); }
+        function resetAutoPlay() { clearInterval(autoPlayInterval); startAutoPlay(); }
+
+        const carouselContainer = document.querySelector('.carousel-container');
+        if (carouselContainer) {
+          carouselContainer.addEventListener('mouseenter', () => clearInterval(autoPlayInterval));
+          carouselContainer.addEventListener('mouseleave', startAutoPlay);
+        }
+        if (totalSlides > 1) startAutoPlay();
+
+        function compartir() {
+          const url = window.location.href;
+          if (navigator.share) {
+            navigator.share({ title: 'Julio Vargas - Tarjeta TDI', url: url });
+          } else {
+            navigator.clipboard.writeText(url).then(() => alert('📋 Enlace copiado'));
+          }
+        }
+
+        function enviarWhatsApp(event) {
+          event.preventDefault();
+          const nombre = document.getElementById('nombre').value.trim();
+          const telefono = document.getElementById('telefono').value.trim();
+          const email = document.getElementById('email').value.trim();
+          const negocio = document.getElementById('negocio').value.trim();
+          const plan = document.getElementById('plan').value;
+
+          if (!nombre || !telefono) {
+            alert('Por favor, completa al menos el nombre y el teléfono.');
+            return;
+          }
+
+          const mensaje = \`📇 *NUEVO AFILIADO TDI*
+
+👤 *Nombre:* \${nombre}
+📱 *Teléfono:* \${telefono}
+📧 *Email:* \${email || 'No especificado'}
+🏢 *Negocio:* \${negocio || 'No especificado'}
+📋 *Plan:* \${plan}
+🔗 *Viene desde:* \${window.location.href}\`;
+
+          const mensajeCodificado = encodeURIComponent(mensaje);
+          const numeroJulio = '573244913371';
+
+          window.open(\`https://wa.me/\${numeroJulio}?text=\${mensajeCodificado}\`, '_blank');
+        }
+      </script>
+    </body>
+    </html>
+  `);
+});
+
+// =============================================
+// INICIAR SERVIDOR
+// =============================================
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(\`✅ Servidor TDI con PULPO 🐙 en puerto \${PORT}\`);
+});
