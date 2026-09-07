@@ -35,11 +35,16 @@ console.log(`📇 ${Object.keys(tarjetas).length} tarjetas cargadas`);
 const app = express();
 const PORT = process.env.PORT || 1880;
 
+// Crear la carpeta uploads si no existe
+const uploadDir = './uploads';
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir);
+  console.log('📁 Carpeta uploads creada');
+}
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const dir = './uploads';
-    if (!fs.existsSync(dir)) fs.mkdirSync(dir);
-    cb(null, dir);
+    cb(null, uploadDir);
   },
   filename: (req, file, cb) => {
     cb(null, Date.now() + '-' + file.originalname);
@@ -767,6 +772,4 @@ app.get('/julio-vargas', (req, res) => {
           display: block;
           margin-bottom: 4px;
         }
-        .campo input, .campo select {
-          width: 100%;
-          padding: 12px 16
+        .camp
