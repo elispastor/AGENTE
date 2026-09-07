@@ -783,5 +783,4 @@ app.get('/julio-vargas', (req, res) => {
           color: #94a3b8;
           font-size: 14px;
           background: rgba(255,255,255,0.04);
-          border: 1px dashed rgba(255,255,255,0.15);
-        }
+          border: 1px dashed rgba(255,255,255,
