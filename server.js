@@ -507,12 +507,18 @@ app.get('/julio-vargas', (req, res) => {
   };
 
   const fotos = [
-    '/uploads/julio-portada.jpg',
-    '/uploads/julio-foto1.jpg',
-    '/uploads/julio-foto2.jpg',
-    '/uploads/julio-foto3.jpg',
-    '/uploads/julio-foto4.jpg'
-  ];
+  'https://raw.githubusercontent.com/elispastor/AGENTE/main/portada-julio.jpg',
+  'https://raw.githubusercontent.com/elispastor/AGENTE/main/A1.jpg',
+  'https://raw.githubusercontent.com/elispastor/AGENTE/main/A2.jpg',
+  'https://raw.githubusercontent.com/elispastor/AGENTE/main/A3.png',
+  'https://raw.githubusercontent.com/elispastor/AGENTE/main/A4.jpg',
+  'https://raw.githubusercontent.com/elispastor/AGENTE/main/A5.jpg',
+  'https://raw.githubusercontent.com/elispastor/AGENTE/main/A6.jpg',
+  'https://raw.githubusercontent.com/elispastor/AGENTE/main/A7.jpg',
+  'https://raw.githubusercontent.com/elispastor/AGENTE/main/A8.png',
+  'https://raw.githubusercontent.com/elispastor/AGENTE/main/A9.jpg',
+  'https://raw.githubusercontent.com/elispastor/AGENTE/main/A10.jpg'
+];
 
   let slidesHTML = '';
   let indicadoresHTML = '';
