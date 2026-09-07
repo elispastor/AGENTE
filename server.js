@@ -785,5 +785,3 @@ app.get('/julio-vargas', (req, res) => {
           background: rgba(255,255,255,0.04);
           border: 1px dashed rgba(255,255,255,0.15);
         }
-        .campo input::placeholder {
-          color: #6b8
