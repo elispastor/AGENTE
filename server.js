@@ -746,41 +746,4 @@ app.get('/julio-vargas', (req, res) => {
           box-shadow: 0 8px 24px rgba(0,0,0,0.3);
         }
         .formulario-section h3 {
-          color: #fbbf24;
-          font-size: 20px;
-          font-weight: 700;
-          text-align: center;
-          margin-bottom: 16px;
-        }
-        .formulario-section p.descripcion {
-          color: #a0c4e8;
-          text-align: center;
-          font-size: 14px;
-          margin-bottom: 20px;
-        }
-        .campo {
-          margin-bottom: 12px;
-        }
-        .campo label {
-          color: #a0c4e8;
-          font-size: 14px;
-          display: block;
-          margin-bottom: 4px;
-        }
-        .campo input, .campo select {
-          width: 100%;
-          padding: 12px 16px;
-          border-radius: 12px;
-          border: none;
-          background: rgba(255,255,255,0.06);
-          color: #fff;
-          font-size: 15px;
-          outline: none;
-          border: 1px solid rgba(255,255,255,0.06);
-        }
-        .campo input[type="file"] {
-          padding: 10px 0;
-          color: #94a3b8;
-          font-size: 14px;
-          background: rgba(255,255,255,0.04);
-          border: 1px dashed rgba(255,255,255,
+          color: #fbbf24
