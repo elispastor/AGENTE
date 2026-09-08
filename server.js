@@ -35,16 +35,11 @@ console.log(`📇 ${Object.keys(tarjetas).length} tarjetas cargadas`);
 const app = express();
 const PORT = process.env.PORT || 1880;
 
-// Crear la carpeta uploads si no existe
-const uploadDir = './uploads';
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir);
-  console.log('📁 Carpeta uploads creada');
-}
-
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, uploadDir);
+    const dir = './uploads';
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir);
+    cb(null, dir);
   },
   filename: (req, file, cb) => {
     cb(null, Date.now() + '-' + file.originalname);
@@ -61,27 +56,6 @@ app.use((req, res, next) => {
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   next();
-});
-
-const conversaciones = {};
-
-// =============================================
-// RUTAS DE PRUEBA
-// =============================================
-app.get('/api/status', (req, res) => {
-  res.json({
-    status: 'online',
-    service: 'TDI - Tarjeta Digital Inteligente',
-    version: '2.1.0',
-    endpoints: {
-      chat: '/chat',
-      generarTarjeta: '/api/generar-tarjeta'
-    }
-  });
-});
-
-app.get('/test', (req, res) => {
-  res.send('✅ Servidor TDI funcionando correctamente');
 });
 
 // =============================================
@@ -117,7 +91,7 @@ app.post('/chat', (req, res) => {
 });
 
 // =============================================
-// GENERAR TARJETA (CON URL CORREGIDA)
+// GENERAR TARJETA
 // =============================================
 app.post('/api/generar-tarjeta', upload.any(), (req, res) => {
   const { nombre, telefono, email } = req.body;
@@ -501,7 +475,7 @@ app.get('/tarjeta/:id', (req, res) => {
 });
 
 // =============================================
-// RUTA ESPECIAL PARA JULIO VARGAS (CON FORMULARIO)
+// RUTA ESPECIAL PARA JULIO VARGAS
 // =============================================
 app.get('/julio-vargas', (req, res) => {
   const tarjeta = {
@@ -512,17 +486,17 @@ app.get('/julio-vargas', (req, res) => {
   };
 
   const fotos = [
-    'https://raw.githubusercontent.com/elispastor/AGENTE/main/images/portada-julio.jpg',
-    'https://raw.githubusercontent.com/elispastor/AGENTE/main/images/A1.jpg',
-    'https://raw.githubusercontent.com/elispastor/AGENTE/main/images/A2.jpg',
-    'https://raw.githubusercontent.com/elispastor/AGENTE/main/images/A3.png',
-    'https://raw.githubusercontent.com/elispastor/AGENTE/main/images/A4.jpg',
-    'https://raw.githubusercontent.com/elispastor/AGENTE/main/images/A5.jpg',
-    'https://raw.githubusercontent.com/elispastor/AGENTE/main/images/A6.jpg',
-    'https://raw.githubusercontent.com/elispastor/AGENTE/main/images/A7.jpg',
-    'https://raw.githubusercontent.com/elispastor/AGENTE/main/images/A8.png',
-    'https://raw.githubusercontent.com/elispastor/AGENTE/main/images/A9.jpg',
-    'https://raw.githubusercontent.com/elispastor/AGENTE/main/images/A10.jpg'
+    'https://raw.githubusercontent.com/elispastor/AGENTE/main/portada-julio.jpg',
+    'https://raw.githubusercontent.com/elispastor/AGENTE/main/A1.jpg',
+    'https://raw.githubusercontent.com/elispastor/AGENTE/main/A2.jpg',
+    'https://raw.githubusercontent.com/elispastor/AGENTE/main/A3.png',
+    'https://raw.githubusercontent.com/elispastor/AGENTE/main/A4.jpg',
+    'https://raw.githubusercontent.com/elispastor/AGENTE/main/A5.jpg',
+    'https://raw.githubusercontent.com/elispastor/AGENTE/main/A6.jpg',
+    'https://raw.githubusercontent.com/elispastor/AGENTE/main/A7.jpg',
+    'https://raw.githubusercontent.com/elispastor/AGENTE/main/A8.png',
+    'https://raw.githubusercontent.com/elispastor/AGENTE/main/A9.jpg',
+    'https://raw.githubusercontent.com/elispastor/AGENTE/main/A10.jpg'
   ];
 
   let slidesHTML = '';
@@ -740,47 +714,37 @@ app.get('/julio-vargas', (req, res) => {
           border-bottom: 2px solid rgba(251, 191, 36, 0.2);
           margin-bottom: 10px;
         }
-        /* ESTILOS DEL FORMULARIO */
-        .formulario-section {
-          background: rgba(255,255,255,0.05);
-          backdrop-filter: blur(8px);
-          border-radius: 24px;
-          padding: 24px 20px;
-          margin-top: 24px;
-          border: 1px solid rgba(255,255,255,0.1);
-          box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+        @media (max-width: 480px) {
+          .container { padding: 16px; }
+          .carousel-slides { height: 220px; }
+          .carousel-btn { width: 32px; height: 32px; font-size: 16px; }
+          .info h2 { font-size: 20px; }
+          .botones a, .botones button { font-size: 13px; padding: 10px 14px; }
+          .qr img { width: 80px; height: 80px; }
+          .menu-panel { width: 240px; }
         }
-        .formulario-section h3 {
-          color: #fbbf24;
-          font-size: 20px;
-          font-weight: 700;
-          text-align: center;
-          margin-bottom: 16px;
-        }
-        .formulario-section p.descripcion {
-          color: #a0c4e8;
-          text-align: center;
-          font-size: 14px;
-          margin-bottom: 20px;
-        }
-        .campo {
-          margin-bottom: 12px;
-        }
-        .campo label {
-          color: #a0c4e8;
-          font-size: 14px;
-          display: block;
-          margin-bottom: 4px;
-        }
-        .campo input, .campo select {
-          width: 100%;
-          padding: 12px 16px;
-          border-radius: 12px;
-          border: none;
-          background: rgba(255,255,255,0.06);
-          color: #fff;
-          font-size: 15px;
-          outline: none;
-          border: 1px solid rgba(255,255,255,0.06);
-        }
-        .campo input[type="file
+        @media (min-width: 768px) { .carousel-slides { height: 420px; } }
+        @media (min-width: 1024px) { .carousel-slides { height: 480px; } }
+      </style>
+    </head>
+    <body>
+      <button class="menu-toggle" id="menuToggle" aria-label="Menú">☰</button>
+      <div class="menu-panel" id="menuPanel">
+        <div class="menu-title">📇 TDI</div>
+        <a href="https://guia-digital.com">🏠 Inicio</a>
+        <a href="https://guia-digital.com/tarjetas">📇 Mis Tarjetas</a>
+        <a href="https://guia-digital.com/planes">📊 Planes</a>
+        <a href="https://guia-digital.com/contacto">📩 Contacto</a>
+        <a href="https://wa.me/04166520591" target="_blank">💬 WhatsApp</a>
+        <a href="mailto:juliovargas1478@gmail.com">📧 Email</a>
+        <a href="#" onclick="compartir()">🔗 Compartir</a>
+      </div>
+      <div class="container">
+        <div class="carousel-container" id="carouselContainer">
+          <div class="carousel-slides" id="carouselSlides">${slidesHTML}</div>
+          <button class="carousel-btn prev" id="prevBtn">&#10094;</button>
+          <button class="carousel-btn next" id="nextBtn">&#10095;</button>
+          <div class="carousel-indicators" id="indicatorsContainer">${indicadoresHTML}</div>
+        </div>
+        <div class="info">
+          <h2>🧾 ${tarjeta.nombre}</h2
