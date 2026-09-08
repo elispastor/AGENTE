@@ -772,4 +772,301 @@ app.get('/julio-vargas', (req, res) => {
           display: block;
           margin-bottom: 4px;
         }
-        .camp
+        .campo input, .campo select {
+          width: 100%;
+          padding: 12px 16px;
+          border-radius: 12px;
+          border: none;
+          background: rgba(255,255,255,0.06);
+          color: #fff;
+          font-size: 15px;
+          outline: none;
+          border: 1px solid rgba(255,255,255,0.06);
+        }
+        .campo input[type="file"] {
+          padding: 10px 0;
+          color: #94a3b8;
+          font-size: 14px;
+          background: rgba(255,255,255,0.04);
+          border: 1px dashed rgba(255,255,255,0.15);
+        }
+        .campo input::placeholder {
+          color: #6b8fa0;
+        }
+        .btn-enviar-wa {
+          width: 100%;
+          padding: 14px;
+          border: none;
+          border-radius: 40px;
+          background: linear-gradient(135deg, #25D366, #128C7E);
+          color: #fff;
+          font-weight: 700;
+          font-size: 16px;
+          cursor: pointer;
+          transition: 0.2s;
+          box-shadow: 0 4px 14px rgba(37, 211, 102, 0.3);
+        }
+        .btn-enviar-wa:hover {
+          transform: scale(1.02);
+        }
+        .texto-informativo {
+          color: #6b8fa0;
+          font-size: 12px;
+          text-align: center;
+          margin-top: 12px;
+        }
+        @media (max-width: 480px) {
+          .container { padding: 16px; }
+          .carousel-slides { height: 220px; }
+          .carousel-btn { width: 32px; height: 32px; font-size: 16px; }
+          .info h2 { font-size: 20px; }
+          .botones a, .botones button { font-size: 13px; padding: 10px 14px; }
+          .qr img { width: 80px; height: 80px; }
+          .menu-panel { width: 240px; }
+        }
+        @media (min-width: 768px) { .carousel-slides { height: 420px; } }
+        @media (min-width: 1024px) { .carousel-slides { height: 480px; } }
+      </style>
+    </head>
+    <body>
+
+      <!-- MENÚ HAMBURGUESA -->
+      <button class="menu-toggle" id="menuToggle" aria-label="Menú">☰</button>
+      <div class="menu-panel" id="menuPanel">
+        <div class="menu-title">📇 TDI</div>
+        <a href="https://guia-digital.com">🏠 Inicio</a>
+        <a href="#" onclick="document.getElementById('formulario-afiliado').scrollIntoView({behavior: 'smooth'}); return false;">📝 Formulario</a>
+        <a href="https://guia-digital.com/tarjetas">📇 Mis Tarjetas</a>
+        <a href="https://guia-digital.com/planes">📊 Planes</a>
+        <a href="https://guia-digital.com/contacto">📩 Contacto</a>
+        <a href="https://wa.me/04166520591" target="_blank">💬 WhatsApp</a>
+        <a href="mailto:juliovargas1478@gmail.com">📧 Email</a>
+        <a href="#" onclick="compartir()">🔗 Compartir</a>
+      </div>
+
+      <div class="container">
+        <!-- CARRUSEL -->
+        <div class="carousel-container" id="carouselContainer">
+          <div class="carousel-slides" id="carouselSlides">${slidesHTML}</div>
+          <button class="carousel-btn prev" id="prevBtn">&#10094;</button>
+          <button class="carousel-btn next" id="nextBtn">&#10095;</button>
+          <div class="carousel-indicators" id="indicatorsContainer">${indicadoresHTML}</div>
+        </div>
+
+        <!-- INFORMACIÓN -->
+        <div class="info">
+          <h2>🧾 ${tarjeta.nombre}</h2>
+          <p>📱 ${tarjeta.telefono}</p>
+          <p>📧 ${tarjeta.email}</p>
+        </div>
+
+        <!-- BOTONES -->
+        <div class="botones">
+          <a href="https://wa.me/${tarjeta.telefono}" target="_blank" class="btn-wa">💬 WhatsApp</a>
+          <a href="tel:${tarjeta.telefono}" class="btn-llamar">📞 Llamar</a>
+          <button class="btn-compartir" onclick="compartir()">🔗 Compartir</button>
+        </div>
+
+        <!-- QR -->
+        <div class="qr">
+          <img src="${qrUrl}" alt="Código QR">
+          <p>📲 Escanea para ver la tarjeta</p>
+        </div>
+
+        <!-- ============================================= -->
+        <!-- FORMULARIO PARA AFILIADOS                    -->
+        <!-- ============================================= -->
+        <div id="formulario-afiliado" class="formulario-section">
+          <h3>📇 Obtén tu Tarjeta TDI</h3>
+          <p class="descripcion">Completa tus datos y sube tus fotos. La información se enviará directamente a Julio para que active tu tarjeta.</p>
+
+          <form id="formAfiliado" onsubmit="enviarWhatsApp(event)">
+            <!-- Nombre -->
+            <div class="campo">
+              <label>Nombre completo / Empresa</label>
+              <input type="text" id="nombre" placeholder="Ej: Julio Vargas" required>
+            </div>
+
+            <!-- Teléfono -->
+            <div class="campo">
+              <label>Teléfono WhatsApp</label>
+              <input type="tel" id="telefono" placeholder="Ej: 573001234567" required>
+            </div>
+
+            <!-- Email -->
+            <div class="campo">
+              <label>Correo electrónico</label>
+              <input type="email" id="email" placeholder="Ej: contacto@negocio.com">
+            </div>
+
+            <!-- Negocio -->
+            <div class="campo">
+              <label>Nombre de tu negocio / emprendimiento</label>
+              <input type="text" id="negocio" placeholder="Ej: Taller El Tigre">
+            </div>
+
+            <!-- BOTÓN PARA FOTO DE PORTADA -->
+            <div class="campo">
+              <label style="color: #fbbf24; font-weight: 600;">🖼️ Foto de Portada (logo)</label>
+              <p style="color: #94a3b8; font-size: 12px; margin-bottom: 4px;">Sube el logo o foto principal de tu negocio</p>
+              <input type="file" id="fotoPortada" accept="image/*">
+            </div>
+
+            <!-- BOTÓN PARA FOTOS DEL CARRUSEL -->
+            <div class="campo">
+              <label style="color: #fbbf24; font-weight: 600;">🎠 Fotos para el Carrusel</label>
+              <p style="color: #94a3b8; font-size: 12px; margin-bottom: 4px;">Puedes seleccionar varias fotos (hasta 10).</p>
+              <input type="file" id="fotosCarrusel" accept="image/*" multiple>
+            </div>
+
+            <!-- Plan -->
+            <div class="campo">
+              <label>Plan de interés</label>
+              <select id="plan">
+                <option value="Básico ($25.000/año) - Sin carrusel">Básico ($25.000/año) - Sin carrusel</option>
+                <option value="Intermedio ($50.000/año) - Con carrusel" selected>Intermedio ($50.000/año) - Con carrusel</option>
+                <option value="Avanzado ($100.000/año) - Carrusel + NFT">Avanzado ($100.000/año) - Carrusel + NFT</option>
+                <option value="Premium ($200.000/año) - Carrusel + PULPO">Premium ($200.000/año) - Carrusel + PULPO</option>
+              </select>
+            </div>
+
+            <!-- Botón de envío -->
+            <button type="submit" class="btn-enviar-wa">
+              💬 Enviar datos por WhatsApp
+            </button>
+          </form>
+
+          <p class="texto-informativo">Al enviar, los datos se enviarán directamente al WhatsApp de Julio para activar tu tarjeta.</p>
+        </div>
+      </div>
+
+      <script>
+        // =============================================
+        // CARRUSEL
+        // =============================================
+        const slidesContainer = document.getElementById('carouselSlides');
+        const slides = slidesContainer.querySelectorAll('.slide');
+        const indicators = document.querySelectorAll('.indicator');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        let currentIndex = 0;
+        const totalSlides = slides.length;
+        let autoPlayInterval;
+
+        function goToSlide(index) {
+          if (index < 0) index = totalSlides - 1;
+          if (index >= totalSlides) index = 0;
+          currentIndex = index;
+          slidesContainer.style.transform = 'translateX(-' + (currentIndex * 100) + '%)';
+          indicators.forEach((ind, i) => {
+            ind.classList.toggle('active', i === currentIndex);
+          });
+        }
+
+        function nextSlide() { goToSlide(currentIndex + 1); }
+        function prevSlide() { goToSlide(currentIndex - 1); }
+
+        if (nextBtn) nextBtn.addEventListener('click', () => { nextSlide(); resetAutoPlay(); });
+        if (prevBtn) prevBtn.addEventListener('click', () => { prevSlide(); resetAutoPlay(); });
+        indicators.forEach(ind => {
+          ind.addEventListener('click', () => {
+            goToSlide(parseInt(ind.dataset.index));
+            resetAutoPlay();
+          });
+        });
+
+        function startAutoPlay() { autoPlayInterval = setInterval(nextSlide, 5000); }
+        function resetAutoPlay() { clearInterval(autoPlayInterval); startAutoPlay(); }
+
+        const carouselContainer = document.getElementById('carouselContainer');
+        if (carouselContainer) {
+          carouselContainer.addEventListener('mouseenter', () => clearInterval(autoPlayInterval));
+          carouselContainer.addEventListener('mouseleave', startAutoPlay);
+        }
+        if (totalSlides > 1) startAutoPlay();
+
+        // =============================================
+        // MENÚ HAMBURGUESA
+        // =============================================
+        const menuToggle = document.getElementById('menuToggle');
+        const menuPanel = document.getElementById('menuPanel');
+        let menuOpen = false;
+
+        menuToggle.addEventListener('click', () => {
+          menuOpen = !menuOpen;
+          menuPanel.classList.toggle('open', menuOpen);
+          menuToggle.textContent = menuOpen ? '✕' : '☰';
+        });
+
+        document.querySelectorAll('.menu-panel a').forEach(link => {
+          link.addEventListener('click', () => {
+            menuPanel.classList.remove('open');
+            menuToggle.textContent = '☰';
+            menuOpen = false;
+          });
+        });
+
+        // =============================================
+        // COMPARTIR
+        // =============================================
+        function compartir() {
+          const url = window.location.href;
+          if (navigator.share) {
+            navigator.share({ title: 'Julio Vargas - Tarjeta TDI', url: url });
+          } else {
+            navigator.clipboard.writeText(url).then(() => alert('📋 Enlace copiado. ¡Comparte tu tarjeta!'));
+          }
+        }
+
+        // =============================================
+        // ENVÍO A WHATSAPP
+        // =============================================
+        function enviarWhatsApp(event) {
+          event.preventDefault();
+
+          const nombre = document.getElementById('nombre').value.trim();
+          const telefono = document.getElementById('telefono').value.trim();
+          const email = document.getElementById('email').value.trim();
+          const negocio = document.getElementById('negocio').value.trim();
+          const plan = document.getElementById('plan').value;
+          const fotoPortada = document.getElementById('fotoPortada').files.length > 0 ? '✅ Sí' : '❌ No';
+          const fotosCarrusel = document.getElementById('fotosCarrusel').files.length > 0 ? '✅ Sí' : '❌ No';
+
+          if (!nombre || !telefono) {
+            alert('Por favor, completa al menos el nombre y el teléfono.');
+            return;
+          }
+
+          const mensaje = `📇 *NUEVO AFILIADO DESDE TARJETA DE JULIO*
+
+          👤 *Nombre:* ${nombre}
+          📱 *Teléfono:* ${telefono}
+          📧 *Email:* ${email || 'No especificado'}
+          🏢 *Negocio:* ${negocio || 'No especificado'}
+          📋 *Plan elegido:* ${plan}
+          🖼️ *Foto de portada:* ${fotoPortada}
+          🎠 *Fotos para carrusel:* ${fotosCarrusel}
+
+          🔗 *Viene desde:* ${window.location.href}`;
+
+          const mensajeCodificado = encodeURIComponent(mensaje);
+          const numeroJulio = '573244913371';
+
+          window.open(`https://wa.me/${numeroJulio}?text=${mensajeCodificado}`, '_blank');
+        }
+      </script>
+    </body>
+    </html>
+  `);
+});
+
+// =============================================
+// PÁGINA PRINCIPAL - REDIRIGE A JULIO VARGAS
+// =============================================
+app.get('/', (req, res) => {
+  res.redirect('/julio-vargas');
+});
+
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`✅ Servidor TDI con PULPO 🐙 en puerto ${PORT}`);
+});
