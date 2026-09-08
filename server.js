@@ -774,3 +774,13 @@ app.get('/julio-vargas', (req, res) => {
         }
         .campo input, .campo select {
           width: 100%;
+          padding: 12px 16px;
+          border-radius: 12px;
+          border: none;
+          background: rgba(255,255,255,0.06);
+          color: #fff;
+          font-size: 15px;
+          outline: none;
+          border: 1px solid rgba(255,255,255,0.06);
+        }
+        .campo
