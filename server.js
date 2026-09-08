@@ -747,4 +747,7 @@ app.get('/julio-vargas', (req, res) => {
           <div class="carousel-indicators" id="indicatorsContainer">${indicadoresHTML}</div>
         </div>
         <div class="info">
-          <h2>🧾 ${tarjeta.nombre}</h2
+          <h2>🧾 ${tarjeta.nombre}</h2>
+          <p>📱 ${tarjeta.telefono}</p>
+          <p>📧 ${tarjeta.email}</p>
+        </
