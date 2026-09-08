@@ -781,8 +781,4 @@ app.get('/julio-vargas', (req, res) => {
           color: #fff;
           font-size: 15px;
           outline: none;
-          border: 1px solid rgba(255,255,255,0.06);
-        }
-        .campo input[type="file"] {
-          padding: 10px 0;
-         
+          border: 1px solid rgba(255,255,255,0.
