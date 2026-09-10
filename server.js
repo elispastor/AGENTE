@@ -33,7 +33,7 @@ const tarjetas = cargarTarjetas();
 console.log(`📇 ${Object.keys(tarjetas).length} tarjetas cargadas`);
 
 const app = express();
-const PORT = process.env.PORT || 1880;
+const PORT = process.env.PORT || 8080;
 
 // Crear la carpeta uploads si no existe
 const uploadDir = './uploads';
